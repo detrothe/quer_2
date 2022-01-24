@@ -1,0 +1,56 @@
+body {
+  /* remove margins and scroll bars */
+  margin: 0;
+  overflow: hidden;
+
+  /* style text */
+  text-align: left;
+  font-size: 12px;
+  font-family: Sans-Serif;
+
+  /* color text */
+  color: #444;
+}
+/*
+h1 {
+  // position the heading
+  position: absolute;
+  width: 100%;
+
+  // make sure that the heading is drawn on top
+  z-index: 1;
+}
+*/
+
+#input_pkte {
+  width: 20px;
+}
+#scene-container {
+  /* tell our scene container to take up the full page */
+  position: absolute;
+  width: 100%;
+  height: 100%;
+
+  /*
+    Set the container's background color to the same as the scene's
+    background to prevent flashing on load
+  */
+  background-color: rgb(110, 194, 228);
+}
+
+#input-container {
+  position: absolute;
+  top: 5px;
+  left: 10px;
+  width: 100%;
+  height: 50px;
+}
+
+#x-spreadsheet-demo {
+  position: absolute; 
+  top: 100px;
+  left: 10px;
+  width: 50%;
+  height: 500px;
+  overflow-y : auto;
+}
