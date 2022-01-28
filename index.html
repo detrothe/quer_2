@@ -11,6 +11,8 @@
 
     <link rel="stylesheet" href="./styles/xspreadsheet.css" type="text/css">
 
+    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+
     <script type="module" src="./src/index.js"></script>
     <!-- <script type="module" src="./src/listener.js"></script> -->
 
@@ -20,25 +22,30 @@
 
 <div id="input-container">
 
-        <h1>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h1>
+    <h1>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h1>
 
     <label>Anzahl Punkte : </label>
     <input type="text" id="input_pkte" name="npkte" value="4">
-    <button type="button" id="button" >Rechnen</button>
-<br>
-    <table>
+    <button type="button" id="button">Rechnen</button>
+    <br>
+    <table id="coord_table">
         <thead>
-        <tr>Heading 1</tr>
-        <tr>Heading 2</tr>
+        <tr>
+            <th>Punkt</th>
+            <th>y [m]</th>
+            <th>z [m]</th>
+        </tr>
         </thead>
         <tbody>
         <tr>
-            <td contenteditable='true' class="zelle">1</td>
-            <td contenteditable='true'>2</td>
+            <td contenteditable='false' class="zelle">1</td>
+            <td contenteditable='true' class="zelle">11</td>
+            <td contenteditable='true' class="zelle">12</td>
         </tr>
         <tr>
-            <td contenteditable='true'>3</td>
-            <td contenteditable='true'>4</td>
+            <td contenteditable='false' class="zelle">2</td>
+            <td contenteditable='true' class="zelle">21</td>
+            <td contenteditable='true' class="zelle">22</td>
         </tr>
         </tbody>
     </table>
@@ -46,6 +53,15 @@
 </div>
 
 <div id="x-spreadsheet-demo"></div>
+
+<canvas id="my-canvas"> </canvas>
+
+<div  id="my-svg">
+<svg id="dataviz_area" height=1000 width=1000>
+    <circle style="fill: #69b3a2" stroke="black" cx=50 cy=50 r=40></circle>
+    <rect x="100" y="100" width="10" height="10"></rect>
+</svg>
+</div>
 
 </body>
 

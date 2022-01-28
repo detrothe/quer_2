@@ -31,20 +31,20 @@ function load() {
         },
         2: {     // Zeile 2
             cells: {
-                1: {text: '4'},
+                1: {text: '400'},
                 2: {text: '0'},
             },
         },
         3: {     // Zeile 3
             cells: {
-                1: {text: '4'},
-                2: {text: '5'},
+                1: {text: '400'},
+                2: {text: '500'},
             },
         },
         4: {     // Zeile 4
             cells: {
                 1: {text: '0'},
-                2: {text: '5'},
+                2: {text: '500'},
             },
         },
         0: {     // Zeile 0
@@ -138,3 +138,11 @@ function load() {
 
 
 load();
+
+// Matrix mit 4 Zeilen und 2 Spalten
+const arr = Array.from(Array(4), () => new Array(2));
+arr[0][0] ='11';arr[0][1] ='12';
+arr[1][0] ='21';arr[1][1] ='22';
+arr[2][0] ='31';arr[2][1] ='32';
+arr[3][0] ='41';arr[3][1] ='42';
+console.info(arr);

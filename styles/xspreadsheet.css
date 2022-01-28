@@ -52,7 +52,7 @@ body {
   margin: 0;
   padding: 0;
   border-collapse: separate;
-  border-spacing: 2;
+  /* border-spacing: 2; */
   background: #fff;
 }
 .x-spreadsheet-color-palette table td {
