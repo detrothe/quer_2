@@ -7,7 +7,7 @@ body {
     /* style text */
     text-align: left;
     font-size: 12px;
-    font-family: Sans-Serif;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
 
     /* color text */
     color: #444;
@@ -74,7 +74,7 @@ h1 {
 #my-svg {
     position: absolute;
     left: 1000px;
-    width : 1000px;
+    width : 700px;
     height : 1000px;
     background-color: rgb(110, 180, 180);
 

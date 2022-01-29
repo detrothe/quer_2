@@ -40,7 +40,6 @@ body {
   width: 8px;
   height: 8px;
   background: inherit;
-  -webkit-transform: rotate(45deg);
   transform: rotate(45deg);
   z-index: 1;
   box-shadow: 1px 1px 3px -1px rgba(0, 0, 0, 0.3);
@@ -441,7 +440,6 @@ body {
   margin: 0;
   vertical-align: middle;
   text-align: left;
-  font-weight: 400;
   color: #80868b;
   white-space: nowrap;
   cursor: pointer;
@@ -792,7 +790,7 @@ form fieldset select {
   border: 1px solid rgba(0, 0, 0, 0.1);
   background-color: #fff;
   background-clip: padding-box;
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 8px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 2px 8px;
 }
 .x-spreadsheet-toast {
   background-color: rgba(255, 255, 255, 0.85);
