@@ -26,6 +26,7 @@ class CQuer_polygon {
     }
 
     set_data(npkte,y,z) {
+
         this.neck = npkte;
         this.y = new Float64Array(this.neck);
         this.z = new Float64Array(this.neck);
@@ -40,13 +41,13 @@ class CQuer_polygon {
         this.x = 5;
      
         this.area = 0.0;
-        this.traegy = 0.0;
-        this.traegz = 0.0;
+        this.Iy = 0.0;
+        this.Iz = 0.0;
         this.sy = 0.0;
         this.sz = 0.0;
         this.ys = 0.0;
         this.zs = 0.0;
-        this.deviat = 0.0;
+        this.Iyz = 0.0;
 
         let a1, a2, a3;
         let j = 1;
@@ -58,9 +59,9 @@ class CQuer_polygon {
             this.area = this.area + a1;
             this.sy = this.sy + a1 * a2;
             this.sz = this.sz + a1 * a3;
-            this.traegy = this.traegy + a1 * (a2 * a2 - this.z[i] * this.z[j]);
-            this.traegz = this.traegz + a1 * (a3 * a3 - this.y[i] * this.y[j]);
-            this.deviat = this.deviat + a1 * (a3 * a2 - (this.y[i] * this.z[j] + this.y[j] * this.z[i]) * 0.5);
+            this.Iy = this.Iy + a1 * (a2 * a2 - this.z[i] * this.z[j]);
+            this.Iz = this.Iz + a1 * (a3 * a3 - this.y[i] * this.y[j]);
+            this.Iyz = this.Iyz + a1 * (a3 * a2 - (this.y[i] * this.z[j] + this.y[j] * this.z[i]) * 0.5);
             j = j + 1;
             if ( j >= this.neck ) j = 0;
         }
@@ -70,13 +71,27 @@ class CQuer_polygon {
         this.sz = this.sz / 6;
         this.zs = this.sy / this.area;
         this.ys = this.sz / this.area;
-        this.traegy = this.traegy / 12;
-        this.traegz = this.traegz / 12;
-        this.traegys = this.traegy - this.zs * this.zs * this.area;
-        this.traegzs = this.traegz - this.ys * this.ys * this.area;
-        this.deviat = this.deviat / 12;
-        this.Iyz_s = this.deviat - this.ys * this.zs * this.area;
-    
+        this.Iy = this.Iy / 12;
+        this.Iz = this.Iz / 12;
+        this.Iy_s = this.Iy - this.zs * this.zs * this.area;
+        this.Iz_s = this.Iz - this.ys * this.ys * this.area;
+        this.Iyz = this.Iyz / 12;
+        this.Iyz_s = this.Iyz - this.ys * this.zs * this.area;
+
+        const temp = 0.5 * (this.Iy_s + this.Iz_s);
+        const tempm = 0.5 * (this.Iy_s - this.Iz_s);
+
+        this.Imax = temp + Math.sqrt(tempm * tempm + this.Iyz_s * this.Iyz_s);
+        this.Imin = temp - Math.sqrt(tempm * tempm + this.Iyz_s * this.Iyz_s);
+
+
+        if ( Math.abs(this.Iy_s - this.Iz_s) < 0.000000000001 && Math.abs(this.Iyz_s) < 0.000000000001 )
+        {
+            this.phi = 0.0;
+        } else {
+            this.phi = Math.atan2( -2 * this.Iyz_s, this.Iy_s - this.Iz_s) * 0.5;
+        }
+
     }
 }
 

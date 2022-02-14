@@ -6,12 +6,16 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
     <link href="./styles/main.css" rel="stylesheet" type="text/css">
-
+    <!-- 
     <link rel="stylesheet" href="./styles/xspreadsheet.css" type="text/css">
 
-    <!-- <script src="https://d3js.org/d3.v7.min.js"></script> -->
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+ -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> -->
 
     <script type="module" src="./src/index.js"></script>
     <!-- <script type="module" src="./src/listener.js"></script> -->
@@ -22,45 +26,145 @@
 
 <div id="input-container">
 
-    <h1>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h1>
+    <h2>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h2>
+
+    <p>Hinweis: gib zuerst die Anzahl Punkte ein und drücke dann den Button resize Tabelle</p>
 
     <label>Anzahl Punkte : </label>
-    <input type="text" id="input_pkte" name="npkte" value="4">
-    <button type="button" id="button">Rechnen</button>
+    <input type="number" id="input_pkte" name="npkte" value="4">
+    <button type="button" id="resize">resize Tabelle</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="button" id="rechnen">Rechnen</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="file" id="files" name="files[]" multiple/>
+    <output id="list"></output>
+    <div id="drop_zone">Drop files here</div>
     <br>
-    <table id="coord_table">
-        <thead>
-        <tr>
-            <th>Punkt</th>
-            <th>y [m]</th>
-            <th>z [m]</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-            <td contenteditable='false' class="zelle">1</td>
-            <td contenteditable='true' class="zelle">11</td>
-            <td contenteditable='true' class="zelle">12</td>
-        </tr>
-        <tr>
-            <td contenteditable='false' class="zelle">2</td>
-            <td contenteditable='true' class="zelle">21</td>
-            <td contenteditable='true' class="zelle">22</td>
-        </tr>
-        </tbody>
-    </table>
+    <output id="list_drop"></output>
+
+    <br><br>
+
+
+    <label for="N_kraft"> N = &nbsp;</label>
+    <input type="text" id="N_kraft" name="normalkraft" class="input_schnitt" pattern="[0-9.,eE+-]*">
+    <label for="My"> [kN],&nbsp;&nbsp; My =&nbsp;</label>
+    <input type="text" id="My" name="My" class="input_schnitt" pattern="[0-9.,eE+-]*">
+    <label for="Mz"> [kNm],&nbsp;&nbsp; Mz =&nbsp;</label>
+    <input type="text" id="Mz" name="Mz" class="input_schnitt" pattern="[0-9.,eE+-]*">
+    <label>[kNm]</label>
+    <br><br><br>
 
 </div>
 
+<div id="tastatur">
+    <!-- Include a header DIV with the same name as the draggable DIV, followed by "header" -->
+    <div id="tastatur_header">Click here to move</div>
+    <div id="taste1" class="tasten">1</div>
+    <div id="taste2" class="tasten">2</div>
+    <div id="taste3" class="tasten">3</div>
+    <div id="taste4" class="tasten">4</div>
+    <div id="taste5" class="tasten">5</div>
+    <div id="taste6" class="tasten">6</div>
+    <div id="taste7" class="tasten">7</div>
+    <div id="taste8" class="tasten">8</div>
+    <div id="taste9" class="tasten">9</div>
+    <div id="taste0" class="tasten">0</div>
+    <div id="taste_komma" class="tasten">,</div>
+    <div id="taste_del" class="tasten">del</div>
+</div>
+
+<div id="schnittgroessen">
+    <h2>Querschnittswerte</h2>
+    <table id="schnittgroessen_table">
+
+        <tbody>
+        <tr>
+            <td class="zelle">ys =</td>
+            <td class="zelle" id="ys"></td>
+            <td class="zelle">cm</td>
+        </tr>
+        <tr>
+            <td class="zelle">zs =</td>
+            <td class="zelle" id="zs"></td>
+            <td class="zelle">cm</td>
+        </tr>
+        <tr>
+            <td class="zelle1">Fläche =</td>
+            <td class="zelle" id="area"></td>
+            <td class="zelle">cm²</td>
+        </tr>
+        <tr>
+            <td class="zelle">I<sub>y,s</sub> =</td>
+            <td class="zelle" id="Iys"></td>
+            <td class="zelle">cm<sup>4</sup></td>
+        </tr>
+        <tr>
+            <td class="zelle">I<sub>z,s</sub> =</td>
+            <td class="zelle" id="Izs"></td>
+            <td class="zelle">cm<sup>4</sup></td>
+        </tr>
+        <tr>
+            <td class="zelle">I<sub>yz,s</sub> =</td>
+            <td class="zelle" id="Iyzs"></td>
+            <td class="zelle">cm<sup>4</sup></td>
+        </tr>
+        <tr>
+            <td class="zelle">I<sub>11</sub> =</td>
+            <td class="zelle" id="I11"></td>
+            <td class="zelle">cm<sup>4</sup></td>
+        </tr>
+        <tr>
+            <td class="zelle">I<sub>22</sub> =</td>
+            <td class="zelle" id="I22"></td>
+            <td class="zelle">cm<sup>4</sup></td>
+        </tr>
+        <tr>
+            <td class="zelle">&phi;<sub>h</sub> =</td>
+            <td class="zelle" id="phi_h"></td>
+            <td class="zelle">°</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!--
 <div id="x-spreadsheet-demo"></div>
 
-<canvas id="my-canvas"> </canvas>
+<canvas id="my-canvas"></canvas>
+-->
 
-<div  id="my-svg">
-<svg id="dataviz_area" height=1000 width=1000>
-    <circle style="fill: #69b3a2" stroke="black" cx=50 cy=50 r=40></circle>
-    <rect x="100" y="100" width="10" height="10"></rect>
-</svg>
+<div id="my-svg">
+
+    <svg id="dataviz_area" height=1000 width=700>
+
+
+        <defs>
+            <!-- arrowhead marker definition -->
+            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="4"
+                    orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" style="fill: black"/>
+            </marker>
+
+            <marker id="arrow_blue" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="4"
+                    orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" style="fill: blue"/>
+            </marker>
+
+            <!-- simple dot marker definition -->
+            <marker id="dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="5" markerHeight="5">
+                <circle cx="5" cy="5" r="5" fill="red"/>
+            </marker>
+
+            <marker id="arrow1" markerUnits="strokeWidth" markerWidth="12" markerHeight="12" viewBox="0 0 12 12"
+                    refX="6" refY="6" orient="auto">
+                <path d="M2,2 L10,6 L2,10 L6,6 L2,2" style="fill: #000;"></path>
+            </marker>
+
+        </defs>
+
+        <!-- <circle style="fill: #69b3a2" stroke="black" cx=50 cy=50 r=40></circle>
+        <rect x="100" y="100" width="10" height="10"></rect> -->
+    </svg>
 </div>
 
 </body>
