@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     /* remove margins and scroll bars */
     margin: 0;
@@ -13,9 +17,72 @@ body {
     color: #444;
 }
 
+/* Style the header */
+.header {
+    grid-area: header;
+    background-color: #f1f1f1;
+    /*padding: 30px;
+    text-align: center;
+    font-size: 35px; */
+}
+
+/* The grid container */
+.grid-container {
+    display: grid;
+    grid-template-areas:
+    'header header header header header header'
+    'left middle middle middle middle right'
+    'footer footer footer footer footer footer';
+    /* grid-column-gap: 10px; - if you want gap between the columns */
+}
+
+.left,
+.middle,
+.right {
+    padding: 10px;
+    /*height: 300px;  Should be removed. Only for demonstration */
+}
+
+/* Style the left column */
+.left {
+    grid-area: left;
+}
+
+/* Style the middle column */
+.middle {
+    grid-area: middle;
+}
+
+/* Style the right column */
+.right {
+    grid-area: right;
+}
+
+/* Style the footer */
+.footer {
+    grid-area: footer;
+    background-color: #f1f1f1;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+@media (max-width: 600px) {
+    .grid-container  {
+        grid-template-areas:
+      'header header header header header header'
+      'left left left left left left'
+      'middle middle middle middle middle middle'
+      'right right right right right right'
+      'footer footer footer footer footer footer';
+    }
+}
+
+
+
 #infoBox {
     /*position: absolute;*/
-    width: 500px;
+    width: 100%;
     height: 100px;
     background-color: rgb(110, 194, 228);
 }
@@ -49,7 +116,7 @@ input:valid {
 }
 
 #input_pkte {
-    width: 50px;
+    width: 4em;
 }
 
 #scene-container {
@@ -66,32 +133,36 @@ input:valid {
 }
 
 .zelle {
-    width: 50px;
+    width: 4em;
 }
 
 .zelle1 {
-    width: 60px;
+    width: 5em;
 }
 
 .input_schnitt {
-    width: 50px;
+    width: 5em;
 }
 
 #input-container {
+    /*
     position: absolute;
     top: 10px;
     left: 10px;
     width: 62em;
+    */
     /*100%; */
     /* height: 50px; */
 }
 
 #schnittgroessen {
+    /*
     position: absolute;
     top: 200px;
     left: 600px;
+
     width: 100%;
-    /* height: 50px; */
+    height: 50px; */
 }
 
 #schnittgroessen_table td {
@@ -133,9 +204,12 @@ input:valid {
 @media (max-width: 999px) {
     */
 #my-svg {
+    /*
     position: absolute;
     top: 1000px;
     left: 10px;
+    */
+
     width: 700px;
     height: 1000px;
     background-color: rgb(110, 180, 180);
@@ -164,7 +238,7 @@ td.selected {
     height: 100px;
     background-color: rgb(110, 180, 180);
 }
-
+/*
 .tasten {
     width: 40px;
     height: 40px;
@@ -174,12 +248,14 @@ td.selected {
     font-family: Arial, sans-serif;
     color: red;
     background-color: darkorange;
-    /*text-align: center;
-    vertical-align: top; */
+    **text-align: center;
+    vertical-align: top; **
     display: flex;
     align-items: center;
     justify-content: center;
 }
+*/
+/*
 #taste1 {
     position: absolute;
     top: 40px;
@@ -285,6 +361,7 @@ td.selected {
     background-color: #2196F3;
     color: #fff;
 }
+ */
 /*
 .highlight {
     background-color: orange;

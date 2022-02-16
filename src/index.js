@@ -203,6 +203,7 @@ for (let i = 1; i < tabelle.rows.length; i++) {
     objCells.item(2).style.backgroundColor = "#FFFFFF";
     objCells.item(1).id = "pt-" + i + "-" + 1;
     objCells.item(2).id = "pt-" + i + "-" + 2;
+    objCells.item(3).contentEditable = false;
 
     //console.log(objCells.item(0));
 }
@@ -456,7 +457,7 @@ if (elem) {
 // (B) "SAVE AS"
 //var myFile = new File([jsonse], "demo.txt", { type: "text/plain;charset=utf-8" });
 //saveAs(myFile);
-
+/*
 const btn_T1 = document.getElementById("taste1");
 btn_T1.addEventListener('click', taste_1);
 const btn_T2 = document.getElementById("taste2");
@@ -651,19 +652,9 @@ function taste_Minus () {
         tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
     }
 }
-/*
-const selectedCellPoly = {
-    isSelected: false,
-    selectedCellRow : -1,
-    selectedCellCol : -1,
-    col: -1,
-    row: -1,
-    wert: 0,
-    activatedMember: null
-};
 
  */
-
+/*
 const polyBox = document.getElementById("polygonTable");
 
 //console.log("polyBox.clientHeight", polyBox.clientHeight);
@@ -722,11 +713,11 @@ function dragElement(elmnt) {
 }
 
 const box = document.getElementById('polygonTable');
-
+*/
 /* listen to the touchMove event,
 every time it fires, grab the location
 of touch and assign it to box */
-
+/*
 box.addEventListener('touchmove', function(e) {
     // grab the location of touch
     var touchLocation = e.targetTouches[0];
@@ -735,13 +726,14 @@ box.addEventListener('touchmove', function(e) {
     box.style.left = touchLocation.pageX + 'px';
     box.style.top = touchLocation.pageY + 'px';
 })
-
+*/
 /* record the position of the touch
 when released using touchend event.
 This will be the drop position. */
-
+/*
 box.addEventListener('touchend', function(e) {
     // current box position.
     var x = parseInt(box.style.left);
     var y = parseInt(box.style.top);
 })
+*/

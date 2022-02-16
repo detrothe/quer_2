@@ -1,4 +1,4 @@
-import { xs } from './index';
+//import { xs } from './index';
 import { CQuer_polygon } from './calc/quer1.js';
 import { CTrans } from './trans.js';
 //import "d3";
@@ -50,7 +50,12 @@ function resize_polyTabelle() {
                     let newCell = newRow.insertCell(j);
 
                     // Append a text node to the cell
-                    let newText = document.createTextNode(i + "," + j);
+                    let newText;
+                    if ( j == 0 ) {
+                        newText = document.createTextNode(String(i));
+                    } else {
+                        newText = document.createTextNode("");
+                    }
                     newCell.appendChild(newText);
                     newCell.style.border = 'solid 1px';
                     newCell.style.padding = '5px';
