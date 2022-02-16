@@ -13,7 +13,12 @@ body {
     color: #444;
 }
 
-
+#infoBox {
+    /*position: absolute;*/
+    width: 500px;
+    height: 100px;
+    background-color: rgb(110, 194, 228);
+}
 td, th {
     padding: 1px 4px;
     width: 100px;
@@ -29,6 +34,12 @@ h1 {
   z-index: 1;
 }
 */
+button {
+    font-size: 1em;
+}
+input {
+    font-size: 1em;
+}
 input:invalid {
     color: red;
 }
@@ -159,7 +170,7 @@ td.selected {
     height: 40px;
     border: 2px solid red;
     border-radius: 5px;
-    font-size: 30px;
+    font-size: 25px;
     font-family: Arial, sans-serif;
     color: red;
     background-color: darkorange;
@@ -238,13 +249,31 @@ td.selected {
     left: 110px;
 }
 
+#taste_Exp {
+    position: absolute;
+    top: 240px;
+    left: 60px;
+}
+
+#taste_Tab {
+    position: absolute;
+    top: 240px;
+    left: 110px;
+}
+
+#taste_Minus {
+    position: absolute;
+    top: 240px;
+    left: 10px;
+}
+
 #tastatur {
     position: absolute;
     z-index: 9;
     top: 600px;
     left: 600px;
     width: 165px;
-    height: 245px;
+    height: 295px;
     border: 1px solid black;
     border-radius: 3px;
 }
