@@ -2,6 +2,7 @@
 //import './spreadsheet/index.js';
 import './listener.js';
 import * as d3 from "d3";
+import DetectOS from 'detectos.js'
 
 //export var xs; // the spreadsheet
 
@@ -14,6 +15,14 @@ const selectedCellPoly = {
     wert: 0,
     activatedMember: null
 };
+
+
+const Detect = new DetectOS();
+
+const infoBox = document.getElementById("infoBox");
+infoBox.innerHTML = "clientwidth=" + document.documentElement.clientWidth + "<br>clientheight=" +  document.documentElement.clientHeight;
+infoBox.innerHTML += "<br>Browser: " + Detect.browser + " Version " + Detect.version;
+infoBox.innerHTML += "<br>OS: " + Detect.OS;
 
 const elem = document.getElementById("input_pkte");
 //elem.setAttribute( 'value','8');
@@ -108,6 +117,12 @@ function tabulate(data, columns) {
         .text(function (d) {
             return d.value;
         })
+        .on('focus', function(ev) {
+            //console.log("in FOCUS");
+            //ev.target.blur();
+            //ev.preventDefault();
+            }
+        )
     //.text("");
 
     return table;
@@ -186,6 +201,8 @@ for (let i = 1; i < tabelle.rows.length; i++) {
     objCells.item(0).style.textAlign = "center";
     objCells.item(1).style.backgroundColor = "#FFFFFF";
     objCells.item(2).style.backgroundColor = "#FFFFFF";
+    objCells.item(1).id = "pt-" + i + "-" + 1;
+    objCells.item(2).id = "pt-" + i + "-" + 2;
 
     //console.log(objCells.item(0));
 }
@@ -194,7 +211,8 @@ const polytable = $("#polygonTable");
 polytable.find("td").mousedown(function (ev) {
     if ( selectedCellPoly.isSelected ) {
         //selectedCellPoly.activatedMember.removeClass("highlight");
-        console.log("is selected");
+        console.log("is selected",$(this).parent());
+
         $("#polygonTable td").removeClass("highlight");
        // $("#polygonTable").addClass("normal");
     }
@@ -204,7 +222,7 @@ polytable.find("td").mousedown(function (ev) {
     activatedMember.addClass("highlight");
     let wert = activatedMember.text();
 
-    console.log("event",row,col,wert,activatedMember);
+    console.log("event",row,col,wert);
     selectedCellPoly.row = row;
     selectedCellPoly.col = col;
     selectedCellPoly.wert = wert;
@@ -463,6 +481,12 @@ const btn_TKomma = document.getElementById("taste_komma");
 btn_TKomma.addEventListener('click', taste_Komma);
 const btn_TDel = document.getElementById("taste_del");
 btn_TDel.addEventListener('click', taste_Del);
+const btn_TExp = document.getElementById("taste_Exp");
+btn_TExp.addEventListener('click', taste_Exp);
+const btn_TMinus = document.getElementById("taste_Minus");
+btn_TMinus.addEventListener('click', taste_Minus);
+const btn_TTab = document.getElementById("taste_Tab");
+btn_TTab.addEventListener('click', taste_Tab);
 
 function taste_1 () {
 
@@ -575,6 +599,58 @@ function taste_Del () {
         tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
     }
 }
+function taste_Exp () {
+
+    if ( selectedCellPoly.isSelected ) {
+        console.log("Taste Exp gedrückt",selectedCellPoly.wert + 'E');
+        const tabelle = document.getElementById("polygonTable");
+        selectedCellPoly.wert = selectedCellPoly.wert + "e";
+        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
+    }
+}
+function taste_Tab () {
+
+    if ( selectedCellPoly.isSelected ) {
+        const tabelle = document.getElementById("polygonTable");
+        //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col]);
+        //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells.item(selectedCellPoly.col));
+        console.log("tabelle",tabelle.classList);
+        //tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].removeClass("highlight");
+        const row = selectedCellPoly.row;
+        const col = selectedCellPoly.col;
+        let str = 'pt-' + row + '-' + col;
+        const elem = document.getElementById(str);
+        console.log("ID",elem.id, elem.classList);
+        elem.classList.remove('highlight');
+        //$("#polygonTable td").removeClass("highlight");
+        if ( col == 1) {
+            str = 'pt-' + row + '-2';
+        }
+        else if ( col == 2 ) {
+            if ( row < npkte ) {
+                str = 'pt-' + Number(row+1) + '-1';
+            } else {
+                str = 'pt-1-1';
+            }
+        }
+
+        const elemNeu = document.getElementById(str);
+        elemNeu.classList.add('highlight');
+        elemNeu.innerText ="";
+        elemNeu.focus();
+        const evt = new Event("mousedown", {"bubbles":true, "cancelable":false});
+        elemNeu.dispatchEvent(evt);
+    }
+}
+function taste_Minus () {
+
+    if ( selectedCellPoly.isSelected ) {
+        console.log("Taste Del gedrückt",selectedCellPoly.wert + "-");
+        const tabelle = document.getElementById("polygonTable");
+        selectedCellPoly.wert = selectedCellPoly.wert + '-';
+        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
+    }
+}
 /*
 const selectedCellPoly = {
     isSelected: false,
@@ -587,6 +663,19 @@ const selectedCellPoly = {
 };
 
  */
+
+const polyBox = document.getElementById("polygonTable");
+
+//console.log("polyBox.clientHeight", polyBox.clientHeight);
+//console.log("polyBox.style.top", polyBox.getBoundingClientRect().top + window.pageYOffset);
+//console.log("top" + document.getElementById("my-svg").style.top);
+
+const tastaturBox = document.getElementById("tastatur");
+const newTop = polyBox.getBoundingClientRect().top + window.scrollY;
+const newLeft = polyBox.getBoundingClientRect().left + polyBox.getBoundingClientRect().width + window.scrollX + 5;
+tastaturBox.style.top = newTop + "px";
+tastaturBox.style.left = newLeft + "px";
+
 
 // Make the DIV element draggable:
 dragElement(document.getElementById("tastatur"));

@@ -12,13 +12,14 @@ const btn1 = document.getElementById("resize");
 btn1.addEventListener('click', resize_polyTabelle);
 
 function testNumber(wert, zeile, spalte) {
-    wert.replace(/,/g, '.');
-    console.log(wert);
+    wert = wert.replace(/,/g, '.');
+    //console.log('Komma entfernt',wert);
     if (isNaN(wert)) {
         //window.alert("Das ist keine Zahl ");
 
         const objCells = document.getElementById("polygonTable").rows.item(zeile).cells;
-        objCells.item(spalte).style.backgroundColor = "red";
+        objCells.item(spalte).style.backgroundColor = "darkred";
+        objCells.item(spalte).style.color = "white";
 
         return 0;
     }
@@ -159,10 +160,12 @@ function rechnen() {
                 if (i > 0) {
                     if (j == 1) {
                         table.rows.item(i).cells.item(j).style.backgroundColor = "white";
+                        table.rows.item(i).cells.item(j).style.color = "black";
                         y[i - 1] = testNumber(col.innerText, i, j);
                     }
                     if (j == 2) {
                         table.rows.item(i).cells.item(j).style.backgroundColor = "white";
+                        table.rows.item(i).cells.item(j).style.color = "black";
                         z[i - 1] = testNumber(col.innerText, i, j);
                     }
                 }
