@@ -1,6 +1,7 @@
 //import {spreadsheet} from './spreadsheet/index.js';
 //import './spreadsheet/index.js';
 import './listener.js';
+import './dateien.js';
 import * as d3 from "d3";
 import DetectOS from 'detectos.js'
 
@@ -8,19 +9,26 @@ import DetectOS from 'detectos.js'
 
 const selectedCellPoly = {
     isSelected: false,
-    selectedCellRow : -1,
-    selectedCellCol : -1,
+    selectedCellRow: -1,
+    selectedCellCol: -1,
     col: -1,
     row: -1,
     wert: 0,
     activatedMember: null
 };
 
+export const myScreen = {
+    clientWidth: 0,
+    clientHeight: 0
+}
+
+myScreen.clientWidth = document.documentElement.clientWidth;
+myScreen.clientHeight = document.documentElement.clientHeight;
 
 const Detect = new DetectOS();
 
 const infoBox = document.getElementById("infoBox");
-infoBox.innerHTML = "clientwidth=" + document.documentElement.clientWidth + "<br>clientheight=" +  document.documentElement.clientHeight;
+infoBox.innerHTML = "clientwidth=" + myScreen.clientWidth + "<br>clientheight=" + myScreen.clientHeight;
 infoBox.innerHTML += "<br>Browser: " + Detect.browser + " Version " + Detect.version;
 infoBox.innerHTML += "<br>OS: " + Detect.OS;
 
@@ -39,8 +47,8 @@ arr[3][0] ='41';arr[3][1] ='42';
 
 console.info(arr);
 
-console.log("height=", document.getElementById("my-svg").clientHeight);
-console.log("width =", document.getElementById("dataviz_area").clientWidth);
+console.log("height=", myScreen.clientHeight);
+console.log("width =", myScreen.clientWidth);
 /*
 var data = [
     {"date": '2013-01-01', "close": 45},
@@ -117,10 +125,10 @@ function tabulate(data, columns) {
         .text(function (d) {
             return d.value;
         })
-        .on('focus', function(ev) {
-            //console.log("in FOCUS");
-            //ev.target.blur();
-            //ev.preventDefault();
+        .on('focus', function (ev) {
+                //console.log("in FOCUS");
+                //ev.target.blur();
+                //ev.preventDefault();
             }
         )
     //.text("");
@@ -210,20 +218,20 @@ for (let i = 1; i < tabelle.rows.length; i++) {
 //--------------------------------------------------------------------
 const polytable = $("#polygonTable");
 polytable.find("td").mousedown(function (ev) {
-    if ( selectedCellPoly.isSelected ) {
+    if (selectedCellPoly.isSelected) {
         //selectedCellPoly.activatedMember.removeClass("highlight");
-        console.log("is selected",$(this).parent());
+        console.log("is selected", $(this).parent());
 
         $("#polygonTable td").removeClass("highlight");
-       // $("#polygonTable").addClass("normal");
+        // $("#polygonTable").addClass("normal");
     }
     const row = Number($(this).parent().index()) + 1;
     const col = $(this).index();
-    const activatedMember= $(ev.target).closest("td");
+    const activatedMember = $(ev.target).closest("td");
     activatedMember.addClass("highlight");
     let wert = activatedMember.text();
 
-    console.log("event",row,col,wert);
+    console.log("event", row, col, wert);
     selectedCellPoly.row = row;
     selectedCellPoly.col = col;
     selectedCellPoly.wert = wert;
@@ -325,138 +333,12 @@ function handleFileSelect(evt) {
     document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
 }
 */
-function handleFileSelect(evt) {
-    var files = evt.target.files; // FileList object
-    console.log("in select");
 
-    // Loop through the FileList and render image files as thumbnails.
-    for (var i = 0, f; f = files[i]; i++) {
-        /*
-                // Only process image files.
-                if (!f.type.match('txt.*')) {
-        console.log("kein match");
-                    continue;
-                }
-        */
-        var reader = new FileReader();
-
-        // Closure to capture the file information.
-        reader.onload = (function (theFile) {
-            return function (e) {
-                // Render thumbnail.
-                var span = document.createElement('span');
-                span.innerHTML = e.target.result.split('\n'); //.join(';');
-                document.getElementById('list').insertBefore(span, null);
-                console.log("in result", e.target.result);
-            };
-        })(f);
-
-        // Read in the image file as a data URL.
-        reader.readAsText(f);
-        console.log("f", reader);
-    }
-}
-
-document.getElementById('files').addEventListener('change', handleFileSelect, false);
-
-
-function handleFileSelect_drop(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-
-    var files = evt.dataTransfer.files; // FileList object.
-
-    // files is a FileList of File objects. List some properties.
-    var output = [];
-    for (var i = 0, f; f = files[i]; i++) {
-        output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-            f.size, ' bytes, last modified: ',
-            f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-            '</li>');
-    }
-    document.getElementById('list_drop').innerHTML = '<ul>' + output.join('') + '</ul>';
-}
-
-function handleDragOver(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
-    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-}
-
-// Setup the dnd listeners.
-var dropZone = document.getElementById('drop_zone');
-dropZone.addEventListener('dragover', handleDragOver, false);
-dropZone.addEventListener('drop', handleFileSelect_drop, false);
-
-let jsonObj = [];
-let yi, zi;
-const npkte = elem.value;
-const y = new Float64Array(npkte);
-const z = new Float64Array(npkte);
-
-//let table = document.getElementById("polygonTable");
-for (let i in tabelle.rows) {
-    let row = tabelle.rows[i]
-    for (let j in row.cells) {
-        let col = row.cells[j]
-
-        if (i > 0) {
-            if (j == 1) {
-                //tabelle.rows.item(i).cells.item(j).style.backgroundColor = "white";
-                yi = col.innerText;
-                y[i - 1] = yi;
-            }
-            if (j == 2) {
-                //tabelle.rows.item(i).cells.item(j).style.backgroundColor = "white";
-                zi = col.innerText;
-                z[i - 1] = zi;
-            }
-        }
-    }
-    if (i > 0) {
-        let item = {}
-        item["y"] = yi;
-        item["z"] = zi;
-
-        jsonObj.push(item);
-    }
-}
-
-console.log("jsonObj", jsonObj);
-
-//const elem = document.getElementById("input_pkte");
-
-if (elem) {
-    const npkte = elem.value;
-
-    let polyData = {
-        'npkte': npkte,
-        'N': 3,
-        'My': 34,
-        'Mz': 44,
-        'Y': y,
-        'Z': z
-    };
-
-
-    let jsonse = JSON.stringify(polyData);   // jsonObj
-
-    let jobj = JSON.parse(jsonse);
-    console.log("und zurück", jobj);
-
-    //var blob = new Blob([jsonse], {type: "application/json"});
-
-    console.log("polyData", jsonse);
-
-    let y_new = jobj.Y;
-    console.log("y_new",y_new);
-}
 
 //document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
-// (B) "SAVE AS"
-//var myFile = new File([jsonse], "demo.txt", { type: "text/plain;charset=utf-8" });
-//saveAs(myFile);
+
+
 /*
 const btn_T1 = document.getElementById("taste1");
 btn_T1.addEventListener('click', taste_1);

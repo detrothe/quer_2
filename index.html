@@ -13,7 +13,7 @@
     <script src="https://d3js.org/d3.v7.min.js"></script>
  -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <script type="module" src="./src/index.js"></script>
     <!-- <script type="module" src="./src/listener.js"></script> -->
@@ -28,11 +28,11 @@
     <div class="header">
         <h2>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h2>
 
-        <div id="infoBox"> </div>
-        <label for="files"> Daten einlesen&nbsp;:</label><input type="file" id="files" name="files[]" multiple/>
+        <div id="infoBox"></div>
+        <label for="readFile"> Daten einlesen&nbsp;:</label><input type="file" id="readFile" name="file"/>
         <output id="list"></output>
-        <label for="SaveFiles"> Daten speichern&nbsp;:</label><input type="file" id="saveFiles" name="files[]" multiple/>
-        <output id="listSave"></output>
+        <label> Daten speichern&nbsp;:</label>
+        <button type="button" id="saveFile">Dateiname eingeben</button>
 
 
     </div>
