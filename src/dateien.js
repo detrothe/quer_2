@@ -1,7 +1,11 @@
+import './listener.js';
+import {resize_polyTabelle} from "./listener";
+
 function handleFileSelect_read(evt) {
 
     const files = evt.target.files; // FileList object
     console.log("in select read");
+    let filename;
 
     // Loop through the FileList and render image files as thumbnails.
     for (let i = 0, f; f = files[i]; i++) {
@@ -12,6 +16,9 @@ function handleFileSelect_read(evt) {
                     continue;
                 }
         */
+        filename = files[0].name;
+        console.log("filename: ", files[0].name);
+
         const reader = new FileReader();
 
         // Closure to capture the file information.
@@ -25,18 +32,48 @@ function handleFileSelect_read(evt) {
                 */
 
                 console.log("in result", e.target.result);
+                let jobj = JSON.parse(e.target.result);
+                console.log("und zurück", jobj);
+
+                // in Tabelle schreiben
+                document.getElementById("input_pkte").value = jobj.npkte;
+                document.getElementById("N_kraft").value = jobj.N;
+                document.getElementById("My").value = jobj.My;
+                document.getElementById("Mz").value = jobj.Mz;
+
+                resize_polyTabelle();
+
+                const tabelle = document.getElementById("polygonTable");
+                for (let i = 1; i < tabelle.rows.length; i++) {
+                    tabelle.rows[i].cells[1].innerText = jobj.Y[i - 1];
+                    tabelle.rows[i].cells[2].innerText = jobj.Z[i - 1];
+                    console.log("y,z",jobj.Y[i-1],jobj.Z[i-1]);
+                }
+
             };
         })(f);
 
         // Read in the image file as a data URL.
         reader.readAsText(f);
-        console.log("f", reader);
+        //console.log("f", reader);
+
+        /*
+                //var blob = new Blob([jsonse], {type: "application/json"});
+                console.log("polyData", jsonse);
+                let y_new = jobj.Y;
+                console.log("y_new", y_new);
+        */
+
     }
+}
+
+function initFileSelect_read() {
+    $("#readFile")[0].value = '';   // Damit man gleiche Datei mehrmals einlesen kann
 }
 
 function handleFileSelect_save() {
 
-    const filename = window.prompt("Name der Datei mit Extension, z.B. test.json\nDie Datei wird im Default Download Ordner gespeichert");
+    const filename = window.prompt("Name der Datei mit Extension, z.B. test.txt\nDie Datei wird im Default Download Ordner gespeichert");
     console.log("in select save");
     console.log("filename", filename);
 
@@ -97,26 +134,18 @@ function handleFileSelect_save() {
 
 
         let jsonse = JSON.stringify(polyData);   // jsonObj
-        /*
-                let jobj = JSON.parse(jsonse);
-                console.log("und zurück", jobj);
 
-                //var blob = new Blob([jsonse], {type: "application/json"});
-
-                console.log("polyData", jsonse);
-
-                let y_new = jobj.Y;
-                console.log("y_new", y_new);
-        */
         const myFile = new File([jsonse], filename, {type: "text/plain;charset=utf-8"});
         saveAs(myFile);
 
     }
 }
 
+document.getElementById('readFile').addEventListener('click', initFileSelect_read, false);
 document.getElementById('readFile').addEventListener('change', handleFileSelect_read, false);
+document.getElementById("saveFile").onclick = handleFileSelect_save;
 
-document.getElementById('saveFile').addEventListener('click', handleFileSelect_save);
+// document.getElementById('saveFile').addEventListener('click', handleFileSelect_save);
 
 /*
 function handleFileSelect_drop(evt) {

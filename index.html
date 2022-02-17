@@ -29,10 +29,10 @@
         <h2>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h2>
 
         <div id="infoBox"></div>
-        <label for="readFile"> Daten einlesen&nbsp;:</label><input type="file" id="readFile" name="file"/>
-        <output id="list"></output>
-        <label> Daten speichern&nbsp;:</label>
-        <button type="button" id="saveFile">Dateiname eingeben</button>
+        <label for="readFile"> Daten einlesen: &nbsp; </label><input type="file" id="readFile" name="file"  />  <!--  style="display:none" -->
+        <!-- <output id="list"></output> -->
+        <label> Daten speichern : &nbsp;</label>
+        <button type="button" id="saveFile" >Dateiname eingeben</button>
 
 
     </div>
@@ -46,6 +46,7 @@
             <label>Anzahl Punkte : </label>
             <input type="number" id="input_pkte" name="npkte" value="4">
             <button type="button" id="resize">resize Tabelle</button>
+            <button type="button" id="clearTable">clear Tabelle</button>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <button type="button" id="rechnen">Rechnen</button>
             <!-- &nbsp;&nbsp;&nbsp;&nbsp;
@@ -165,7 +166,7 @@
     </div>
 
     <div class="footer">
-        <p>&copy; Detlef Rothe, statikverstehen.de</p>
+        <p>&copy; Detlef Rothe, 17-Feb-2022, statikverstehen.de</p>
     </div>
 </div>
 

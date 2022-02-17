@@ -4,12 +4,18 @@ import { CTrans } from './trans.js';
 //import "d3";
 import * as d3 from "d3";
 
+//------------------------------------------------------------------------------------------------
 
-const btn = document.getElementById("rechnen");                  //querySelector('button');
-btn.addEventListener('click', rechnen);
+const btn1 = document.getElementById("rechnen");                  //querySelector('button');
+btn1.addEventListener('click', rechnen);
 
-const btn1 = document.getElementById("resize");
-btn1.addEventListener('click', resize_polyTabelle);
+const btn2 = document.getElementById("resize");
+btn2.addEventListener('click', resize_polyTabelle);
+
+const btn3 = document.getElementById("clearTable");
+btn3.addEventListener('click', clear_polyTabelle);
+
+//------------------------------------------------------------------------------------------------
 
 function testNumber(wert, zeile, spalte) {
     wert = wert.replace(/,/g, '.');
@@ -26,7 +32,15 @@ function testNumber(wert, zeile, spalte) {
     return wert;
 }
 
-function resize_polyTabelle() {
+function clear_polyTabelle() {
+    const tabelle = document.getElementById("polygonTable");
+    for (let i = 1; i < tabelle.rows.length; i++) {
+        tabelle.rows[i].cells[1].innerText = "";
+        tabelle.rows[i].cells[2].innerText = "";
+    }
+}
+
+export function resize_polyTabelle() {
     console.info("in init");
     const elem = document.getElementById("input_pkte");
     if (elem) {
@@ -119,7 +133,7 @@ function rechnen() {
     //console.log('client height: = ', document.getElementById("x-spreadsheet-demo").clientHeight);
 
     const elem = document.getElementById("input_pkte");
-    let yi, zi;
+    //let yi, zi;
     let str = "";
 
     if (elem) {
@@ -187,7 +201,7 @@ function rechnen() {
             if (z[i] > zmax) zmax = z[i];
         }
 
-        slmax = Math.sqrt((ymax - ymin) ** 2 + (zmax - zmin) ** 2);
+        //slmax = Math.sqrt((ymax - ymin) ** 2 + (zmax - zmin) ** 2);
 
 
         const quer = new CQuer_polygon(npkte);
