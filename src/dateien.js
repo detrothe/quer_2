@@ -1,5 +1,6 @@
 import './listener.js';
 import {resize_polyTabelle} from "./listener";
+import {app, myScreen} from "./index";
 
 function handleFileSelect_read(evt) {
 
@@ -47,7 +48,7 @@ function handleFileSelect_read(evt) {
                 for (let i = 1; i < tabelle.rows.length; i++) {
                     tabelle.rows[i].cells[1].innerText = jobj.Y[i - 1];
                     tabelle.rows[i].cells[2].innerText = jobj.Z[i - 1];
-                    console.log("y,z",jobj.Y[i-1],jobj.Z[i-1]);
+                    console.log("y,z", jobj.Y[i - 1], jobj.Z[i - 1]);
                 }
 
             };
@@ -71,16 +72,15 @@ function initFileSelect_read() {
     $("#readFile")[0].value = '';   // Damit man gleiche Datei mehrmals einlesen kann
 }
 
-function handleFileSelect_save() {
+async function handleFileSelect_save() {
 
-    const filename = window.prompt("Name der Datei mit Extension, z.B. test.txt\nDie Datei wird im Default Download Ordner gespeichert");
+    //const filename = window.prompt("Name der Datei mit Extension, z.B. test.txt\nDie Datei wird im Default Download Ordner gespeichert");
     console.log("in select save");
-    console.log("filename", filename);
+    //console.log("filename", filename);
 
     const elem = document.getElementById("input_pkte");
 
     if (elem) {
-
 
         let jsonObj = [];
         let yi, zi;
@@ -134,17 +134,109 @@ function handleFileSelect_save() {
 
 
         let jsonse = JSON.stringify(polyData);   // jsonObj
+        /*
+                const myFile = new File([jsonse], filename, {type: "text/plain;charset=utf-8"});
+                saveAs(myFile);
+        */
+        // download( jsonse );
 
-        const myFile = new File([jsonse], filename, {type: "text/plain;charset=utf-8"});
-        saveAs(myFile);
+        /*   Das geht auch
+        var bb = new Blob([jsonse], { type: 'text/plain' });
+        var a = document.createElement('a');
+        a.download = 'download1.txt';
+        a.href = window.URL.createObjectURL(bb);
+        a.click();
+
+         */
+
+//        async function saveFile() {
+
+        if (app.hasFSAccess) {
+
+            //window.alert("showSaveFilePicker bekannt")
+
+            try {
+                // (A) CREATE BLOB OBJECT
+                const myBlob = new Blob([jsonse], {type: "text/plain"});
+
+                // (B) FILE HANDLER & FILE STREAM
+                const fileHandle = await window.showSaveFilePicker({
+                    types: [{
+                        description: "Text file",
+                        accept: {"text/plain": [".txt"]}
+                    }]
+                });
+                const infoBox = document.getElementById("infoBox");
+                //infoBox.innerHTML = "infoBox=" + infoBox + "<br>";
+
+                const fileStream = await fileHandle.createWritable();
+                //infoBox.innerHTML += "fileStream=" + fileStream + "<br>";
+
+                // (C) WRITE FILE
+                await fileStream.write(myBlob);
+                await fileStream.close();
+
+            } catch (error) {
+                alert(error.name);
+                alert(error.message);
+            }
+
+        } else {
+
+            //window.alert("showSaveFilePicker UNBEKANNT");
+            const filename = window.prompt("Name der Datei mit Extension, z.B. test.txt\nDie Datei wird im Default Download Ordner gespeichert");
+            const myFile = new File([jsonse], filename, {type: "text/plain;charset=utf-8"});
+            try {
+                saveAs(myFile);
+            } catch (error) {
+                alert(error.name);
+                alert(error.message);
+            }
+
+        }
 
     }
+
+    //  }
 }
 
 document.getElementById('readFile').addEventListener('click', initFileSelect_read, false);
 document.getElementById('readFile').addEventListener('change', handleFileSelect_read, false);
-document.getElementById("saveFile").onclick = handleFileSelect_save;
+document.getElementById('saveFile').addEventListener('click', handleFileSelect_save, false);
+//
+// document.getElementById("saveFile").onclick = handleFileSelect_save;
+/*
+let fileHandle;
+document.getElementById('saveFile').addEventListener('click', async () => {
+    // Destructure the one-element array.
+    fileHandle = await window.showOpenFilePicker();
+    // Do something with the file handle.
+});
+*/
 
+/*
+function download(content)
+{
+
+    var file = new Blob([content],
+        {
+            type: 'text/xml;charset=UTF-8'
+        });
+    var reader = new FileReader();
+    reader.onload = function()
+    {
+        var popup = window.open();
+        console.log("popup",popup);
+        var link = document.createElement('a');
+        link.setAttribute('href', reader.result);
+        link.setAttribute('download', 'filename.xml');
+        popup.document.body.appendChild(link);
+        link.click();
+        popup.close;
+    }
+    reader.readAsDataURL(file);
+}
+*/
 // document.getElementById('saveFile').addEventListener('click', handleFileSelect_save);
 
 /*

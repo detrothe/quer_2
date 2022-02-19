@@ -1,9 +1,12 @@
 //import {spreadsheet} from './spreadsheet/index.js';
 //import './spreadsheet/index.js';
+'use strict';
+
 import './listener.js';
 import './dateien.js';
 import * as d3 from "d3";
 import DetectOS from 'detectos.js'
+
 
 //export var xs; // the spreadsheet
 
@@ -19,18 +22,53 @@ const selectedCellPoly = {
 
 export const myScreen = {
     clientWidth: 0,
-    clientHeight: 0
+    clientHeight: 0,
+    svgWidth: 0
 }
 
 myScreen.clientWidth = document.documentElement.clientWidth;
 myScreen.clientHeight = document.documentElement.clientHeight;
 
+
+if (myScreen.clientWidth > 1500) {
+    myScreen.svgWidth = myScreen.clientWidth - 900;
+    document.getElementById("my-svg").style.width = myScreen.svgWidth + 'px';
+} else {
+    myScreen.svgWidth = 700;
+}
+
+export const app = {
+    appName: 'polyQuerschnitt',
+    file: {
+        handle: null,
+        name: null,
+        isModified: false,
+    },
+    options: {
+        captureTabs: true,
+        fontSize: 14,
+        monoSpace: false,
+        wordWrap: true,
+    },
+    hasFSAccess: 'chooseFileSystemEntries' in window ||
+        'showOpenFilePicker' in window,
+    isMac: navigator.userAgent.includes('Mac OS X'),
+};
+
+
 const Detect = new DetectOS();
 
 const infoBox = document.getElementById("infoBox");
-infoBox.innerHTML = "clientwidth=" + myScreen.clientWidth + "<br>clientheight=" + myScreen.clientHeight;
+infoBox.innerHTML = "clientwidth=" + myScreen.clientWidth + "&nbsp;,&nbsp;&nbsp;    clientheight=" + myScreen.clientHeight;
 infoBox.innerHTML += "<br>Browser: " + Detect.browser + " Version " + Detect.version;
-infoBox.innerHTML += "<br>OS: " + Detect.OS;
+infoBox.innerHTML += "<br>OS: " + Detect.OS + " , isMac: " + app.isMac;
+if (app.hasFSAccess) {
+    infoBox.innerHTML += "<br>showSaveFilePicker wird unterstützt";
+} else {
+    infoBox.innerHTML += "<br>showSaveFilePicker wird NICHT unterstützt";
+}
+
+
 
 const elem = document.getElementById("input_pkte");
 //elem.setAttribute( 'value','8');
@@ -125,10 +163,52 @@ function tabulate(data, columns) {
         .text(function (d) {
             return d.value;
         })
-        .on('focus', function (ev) {
-                //console.log("in FOCUS");
-                //ev.target.blur();
-                //ev.preventDefault();
+        .on('keydown', function (ev) {
+                // console.log("in FOCUS",ev.keyCode);
+                // trap the return and space keys being pressed
+                if (ev.keyCode === 32) {
+                    ev.preventDefault();
+                }
+
+                if (ev.keyCode === 13) {
+                    ev.preventDefault();
+
+                    const el = document.getElementById("input_pkte");
+                    if (el) {
+                        const npkte = el.value;
+
+                        const tabelle = document.getElementById("polygonTable");
+                        //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col]);
+                        //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells.item(selectedCellPoly.col));
+                        console.log("tabelle", tabelle.classList);
+                        //tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].removeClass("highlight");
+                        const row = selectedCellPoly.row;
+                        const col = selectedCellPoly.col;
+                        let str = 'pt-' + row + '-' + col;
+                        const elem = document.getElementById(str);
+                        console.log("ID", elem.id, elem.classList);
+                        elem.classList.remove('highlight');
+                        //$("#polygonTable td").removeClass("highlight");
+                        if (col == 1) {
+                            str = 'pt-' + row + '-2';
+                        } else if (col == 2) {
+                            if (row < npkte) {
+                                str = 'pt-' + Number(row + 1) + '-1';
+                            } else {
+                                str = 'pt-1-1';
+                            }
+                        }
+
+                        const elemNeu = document.getElementById(str);
+                        elemNeu.classList.add('highlight');
+                        elemNeu.innerText = "";
+                        elemNeu.focus();
+                        const evt = new Event("mousedown", {"bubbles": true, "cancelable": false});
+                        elemNeu.dispatchEvent(evt);
+
+                    }
+
+                }
             }
         )
     //.text("");
@@ -212,6 +292,7 @@ for (let i = 1; i < tabelle.rows.length; i++) {
     objCells.item(1).id = "pt-" + i + "-" + 1;
     objCells.item(2).id = "pt-" + i + "-" + 2;
     objCells.item(3).contentEditable = false;
+    objCells.item(1).wrap = false;
 
     //console.log(objCells.item(0));
 }
@@ -336,7 +417,6 @@ function handleFileSelect(evt) {
 
 
 //document.getElementById('files').addEventListener('change', handleFileSelect, false);
-
 
 
 /*

@@ -1,3 +1,5 @@
+import {myScreen} from "./index";
+
 class CTrans {
     constructor(ymin, zmin, ymax, zmax) {
 
@@ -26,9 +28,10 @@ class CTrans {
         console.log("dy,dz", this.dy, this.dz);
 
         this.height = document.getElementById("my-svg").clientHeight - 1;
-        this.width = document.getElementById("dataviz_area").clientWidth - 1;
+        //this.width = document.getElementById("dataviz_area").clientWidth - 1;
+        this.width = myScreen.svgWidth - 1;
 
-        //this.ratio = this.width / this.height;
+            //this.ratio = this.width / this.height;
 
         dz = this.dy * this.height / this.width;
         console.log("dz", dz, this.dz);

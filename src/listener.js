@@ -3,6 +3,7 @@ import { CQuer_polygon } from './calc/quer1.js';
 import { CTrans } from './trans.js';
 //import "d3";
 import * as d3 from "d3";
+import {myScreen} from "./index";
 
 //------------------------------------------------------------------------------------------------
 
@@ -16,6 +17,9 @@ const btn3 = document.getElementById("clearTable");
 btn3.addEventListener('click', clear_polyTabelle);
 
 //------------------------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------------------------
+
 
 function testNumber(wert, zeile, spalte) {
     wert = wert.replace(/,/g, '.');
@@ -32,6 +36,8 @@ function testNumber(wert, zeile, spalte) {
     return wert;
 }
 
+//------------------------------------------------------------------------------------------------
+
 function clear_polyTabelle() {
     const tabelle = document.getElementById("polygonTable");
     for (let i = 1; i < tabelle.rows.length; i++) {
@@ -39,6 +45,9 @@ function clear_polyTabelle() {
         tabelle.rows[i].cells[2].innerText = "";
     }
 }
+
+//------------------------------------------------------------------------------------------------
+
 
 export function resize_polyTabelle() {
     console.info("in init");
@@ -86,6 +95,9 @@ export function resize_polyTabelle() {
         }
     }
 }
+
+//------------------------------------------------------------------------------------------------
+
 function rechnen() {
     //alert('rechnen');
 
@@ -127,6 +139,18 @@ function rechnen() {
     //xs.cellText(6, 6, 'xxx').reRender();
 
     //console.log("in test");
+
+    if ( document.documentElement.clientWidth > 1500 ) {
+        myScreen.svgWidth = document.documentElement.clientWidth - 900;
+        document.getElementById("my-svg").style.width = myScreen.svgWidth +'px';
+    } else {
+        myScreen.svgWidth = 700;
+    }
+
+
+    //const polyBox = document.getElementById("polygonTable");
+    const svgBox = document.getElementById("my-svg");
+
     console.log(document.documentElement.clientHeight);
     console.log(document.documentElement.clientWidth);
     //console.log('client width: = ', document.getElementById("x-spreadsheet-demo").clientWidth);
@@ -301,6 +325,8 @@ function rechnen() {
         //ctx.draw  .drawRegularPolygon(5,25,150,50,6,'gray','gold',0);
         */
 
+        document.getElementById("dataviz_area").setAttribute("width", myScreen.svgWidth + "px");
+
         const svg = d3.select("#dataviz_area")
         svg.selectAll("circle").remove(); // Kreise entfernen aus früheren Berechnungen damit Tooltip funktioniert
         svg.selectAll("line").remove();
@@ -434,9 +460,12 @@ function rechnen() {
             })
             .on("mousemove", function (event) {
                 const vec = d3.pointer(event);
-                const yp = Number(vec[0]) + 10;
-                const zp = Number(vec[1]) - 10;
-                console.log("vec", vec, vec[0], vec[1], yp, zp, event.pageX, event.pageY);
+                const svgBox = document.getElementById("my-svg");
+                //let yp = Number(vec[0]) + 10 + svgBox.getBoundingClientRect().left;
+                //let zp = Number(vec[1]) - 20 + svgBox.getBoundingClientRect().top;
+                const yp = event.pageX + 10;
+                const zp = event.pageY - 20;
+                //console.log("vec", vec, vec[0], vec[1], yp, zp, event.pageX, event.pageY,"|",svgBox.getBoundingClientRect().left);
                 return tooltip.style("top", zp + "px").style("left", yp + "px");
             })
             .on("mouseout", function () {
@@ -449,15 +478,13 @@ function rechnen() {
 
     }
 
-    const polyBox = document.getElementById("polygonTable");
-
+/*
     console.log("polyBox.clientHeight", polyBox.clientHeight);
     console.log("polyBox.style.top", polyBox.getBoundingClientRect().top + window.pageYOffset);
 
     console.log("top" + document.getElementById("my-svg").style.top);
 
-    const svgBox = document.getElementById("my-svg");
     const newTop = polyBox.getBoundingClientRect().top + window.pageYOffset + polyBox.clientHeight;
     svgBox.style.top = newTop + "px";
-
+*/
 }

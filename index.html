@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="UTF-8"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="polyquerschnitt">
 
     <link href="./styles/main.css" rel="stylesheet" type="text/css">
     <!--
@@ -29,10 +30,11 @@
         <h2>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h2>
 
         <div id="infoBox"></div>
-        <label for="readFile"> Daten einlesen: &nbsp; </label><input type="file" id="readFile" name="file"  />  <!--  style="display:none" -->
+        <label for="readFile"> Daten einlesen: &nbsp; </label><input type="file" id="readFile" name="file"/>
+        <!--  style="display:none" -->
         <!-- <output id="list"></output> -->
         <label> Daten speichern : &nbsp;</label>
-        <button type="button" id="saveFile" >Dateiname eingeben</button>
+        <button type="button" id="saveFile">Dateiname eingeben</button>
 
 
     </div>
@@ -58,7 +60,26 @@
 -->
             <br><br>
 
-
+            <table>
+                <tbody>
+                <tr>
+                    <td class="zelle0">N =</td>
+                    <td><input type="text" id="N_kraft" name="normalkraft" class="input_schnitt" pattern="[0-9.,eE+-]*"></td>
+                    <td>[kN]</td>
+                </tr>
+                <tr>
+                    <td class="zelle0">M<sub>y</sub> =</td>
+                    <td><input type="text" id="My" name="My" class="input_schnitt" pattern="[0-9.,eE+-]*"></td>
+                    <td>[kNm]</td>
+                </tr>
+                <tr>
+                    <td class="zelle0">M<sub>z</sub> =</td>
+                    <td><input type="text" id="Mz" name="Mz" class="input_schnitt" pattern="[0-9.,eE+-]*"></td>
+                    <td>[kNm]</td>
+                </tr>
+                </tbody>
+            </table>
+<!--
             <label for="N_kraft"> N = &nbsp;&nbsp;</label>
             <input type="text" id="N_kraft" name="normalkraft" class="input_schnitt" pattern="[0-9.,eE+-]*">
             <label> [kN]</label> <br>
@@ -68,10 +89,12 @@
             <label for="Mz">M<sub>z</sub> =&nbsp;</label>
             <input type="text" id="Mz" name="Mz" class="input_schnitt" pattern="[0-9.,eE+-]*">
             <label>[kNm]</label>
+-->
             <br><br><br>
 
         </div>
     </div>
+
     <div class="middle" style="background-color:#bbb;">
         <div id="schnittgroessen">
             <h3>Querschnittswerte</h3>
@@ -166,7 +189,7 @@
     </div>
 
     <div class="footer">
-        <p>&copy; Detlef Rothe, 17-Feb-2022, statikverstehen.de</p>
+        <p>&copy; Detlef Rothe, 19-Feb-2022, statikverstehen.de</p>
     </div>
 </div>
 

@@ -1,7 +1,7 @@
 {
   "name": "quer_1",
-  "version": "1.0.0",
-  "description": "Querschnittsberechnung",
+  "version": "0.5.0",
+  "description": "Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts",
   "scripts": {
     "build": "parcel build index.html",
     "dev": "parcel index.html --open",
