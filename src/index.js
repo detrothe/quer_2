@@ -399,6 +399,15 @@ if (window.File && window.FileReader && window.FileList && window.Blob) {
     alert('The File APIs are not fully supported in this browser.');
 }
 
+
+const coordy = document.getElementById("cursor_coordy");
+const coordz = document.getElementById("cursor_coordz");
+
+console.log("coordyz",coordy.getBoundingClientRect().top,coordz.getBoundingClientRect().top,coordy.offsetHeight,coordz.offsetHeight,coordy.clientHeight,coordz.clientHeight,coordy.clientTop,coordz.clientTop);
+
+//coordz.setAttribute("top", coordy.getBoundingClientRect().top);
+//coordz.style.top =  "15px";
+
 /*
 function handleFileSelect(evt) {
     var files = evt.target.files; // FileList object

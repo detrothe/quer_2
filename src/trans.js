@@ -13,10 +13,10 @@ class CTrans {
         dy = this.ymax - this.ymin;
         dz = this.zmax - this.zmin;
 
-        this.ymin -= 0.1*dy;
-        this.ymax += 0.1*dy;
-        this.zmin -= 0.1*dz;
-        this.zmax += 0.1*dz;
+        this.ymin -= 0.1 * dy;
+        this.ymax += 0.1 * dy;
+        this.zmin -= 0.1 * dz;
+        this.zmax += 0.1 * dz;
 
         this.dy = this.ymax - this.ymin;
         this.dz = this.zmax - this.zmin;
@@ -31,7 +31,7 @@ class CTrans {
         //this.width = document.getElementById("dataviz_area").clientWidth - 1;
         this.width = myScreen.svgWidth - 1;
 
-            //this.ratio = this.width / this.height;
+        //this.ratio = this.width / this.height;
 
         dz = this.dy * this.height / this.width;
         console.log("dz", dz, this.dz);
@@ -43,14 +43,13 @@ class CTrans {
             this.zmin = this.zmin - delta_dz;
             this.zmax = this.zmax + delta_dz;
             this.dz = this.zmax - this.zmin;
-            console.log("new z", delta_dz, this.zmin, this.zmax,this.dz);
-        }
-        else if (dy >= this.dy) {
+            console.log("new z", delta_dz, this.zmin, this.zmax, this.dz);
+        } else if (dy >= this.dy) {
             const delta_dy = (dy - this.dy) / 2;
             this.ymin = this.ymin - delta_dy;
             this.ymax = this.ymax + delta_dy;
             this.dy = this.ymax - this.ymin;
-            console.log("new y", delta_dy, this.ymin, this.ymax,this.dy);
+            console.log("new y", delta_dy, this.ymin, this.ymax, this.dy);
         }
     }
 
@@ -61,6 +60,14 @@ class CTrans {
     zPix(z) {
         return (z - this.zmin) * this.height / this.dz;
     }
-}
 
+    yWorld(yPix) {
+        return this.ymax - yPix * this.dy / this.width;
+    }
+
+    zWorld(zPix) {
+        return zPix * this.dz / this.height + this.zmin;
+    }
+
+}
 export {CTrans};

@@ -1,6 +1,6 @@
 //import { xs } from './index';
-import { CQuer_polygon } from './calc/quer1.js';
-import { CTrans } from './trans.js';
+import {CQuer_polygon} from './calc/quer1.js';
+import {CTrans} from './trans.js';
 //import "d3";
 import * as d3 from "d3";
 import {myScreen} from "./index";
@@ -74,7 +74,7 @@ export function resize_polyTabelle() {
 
                     // Append a text node to the cell
                     let newText;
-                    if ( j == 0 ) {
+                    if (j == 0) {
                         newText = document.createTextNode(String(i));
                     } else {
                         newText = document.createTextNode("");
@@ -140,9 +140,9 @@ function rechnen() {
 
     //console.log("in test");
 
-    if ( document.documentElement.clientWidth > 1500 ) {
+    if (document.documentElement.clientWidth > 1500) {
         myScreen.svgWidth = document.documentElement.clientWidth - 900;
-        document.getElementById("my-svg").style.width = myScreen.svgWidth +'px';
+        document.getElementById("my-svg").style.width = myScreen.svgWidth + 'px';
     } else {
         myScreen.svgWidth = 700;
     }
@@ -199,7 +199,7 @@ function rechnen() {
             for (let j in row.cells) {
                 let col = row.cells[j]
                 //console.log('i=',i,' j=',j,' inner| ',col.innerHTML);
-        
+
                 if (i > 0) {
                     if (j == 1) {
                         table.rows.item(i).cells.item(j).style.backgroundColor = "white";
@@ -328,6 +328,25 @@ function rechnen() {
         document.getElementById("dataviz_area").setAttribute("width", myScreen.svgWidth + "px");
 
         const svg = d3.select("#dataviz_area")
+
+        .on("mousemove", function (event) {
+            const vec = d3.pointer(event);
+            const coordy = document.getElementById("cursor_coordy");
+            const coordz = document.getElementById("cursor_coordz");
+            //let yp = Number(vec[0]) + 10 + svgBox.getBoundingClientRect().left;
+            //let zp = Number(vec[1]) - 20 + svgBox.getBoundingClientRect().top;
+            const yp = event.pageX + 10;
+            const zp = event.pageY - 20;
+            const y = (tr.yWorld(vec[0])).toFixed(1);
+            const z = (tr.zWorld(vec[1])).toFixed(1);
+            //console.log("mouse move1", y );
+            coordy.innerText = "y:" + y;
+            coordz.innerText = "z:" + z;
+            //console.log("vec", vec, vec[0], vec[1], yp, zp, event.pageX, event.pageY,"|",svgBox.getBoundingClientRect().left);
+            //return tooltip.style("top", zp + "px").style("left", yp + "px");
+        });
+
+
         svg.selectAll("circle").remove(); // Kreise entfernen aus früheren Berechnungen damit Tooltip funktioniert
         svg.selectAll("line").remove();
         svg.selectAll("polygon").remove();
@@ -451,7 +470,7 @@ function rechnen() {
 
         d3.select("#circleBasicTooltip")
             .on("mouseover", function () {
-                console.log("in mouseover");
+                //console.log("in mouseover");
                 d3.select(this)
                     .style("fill", "orange");
                 //tooltip.text("test");
@@ -478,13 +497,13 @@ function rechnen() {
 
     }
 
-/*
-    console.log("polyBox.clientHeight", polyBox.clientHeight);
-    console.log("polyBox.style.top", polyBox.getBoundingClientRect().top + window.pageYOffset);
+    /*
+        console.log("polyBox.clientHeight", polyBox.clientHeight);
+        console.log("polyBox.style.top", polyBox.getBoundingClientRect().top + window.pageYOffset);
 
-    console.log("top" + document.getElementById("my-svg").style.top);
+        console.log("top" + document.getElementById("my-svg").style.top);
 
-    const newTop = polyBox.getBoundingClientRect().top + window.pageYOffset + polyBox.clientHeight;
-    svgBox.style.top = newTop + "px";
-*/
+        const newTop = polyBox.getBoundingClientRect().top + window.pageYOffset + polyBox.clientHeight;
+        svgBox.style.top = newTop + "px";
+    */
 }
