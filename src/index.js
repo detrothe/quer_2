@@ -69,7 +69,6 @@ if (app.hasFSAccess) {
 }
 
 
-
 const elem = document.getElementById("input_pkte");
 //elem.setAttribute( 'value','8');
 elem.value = 10;
@@ -388,7 +387,7 @@ table.find("td").mousedown(function (e) {
 $(document).mouseup(function () {
     isMouseDown = false;
 });
-
+/*
 console.log("navigator", navigator.clipboard);
 
 // Check for the various File API support.
@@ -404,7 +403,23 @@ const coordy = document.getElementById("cursor_coordy");
 const coordz = document.getElementById("cursor_coordz");
 
 console.log("coordyz",coordy.getBoundingClientRect().top,coordz.getBoundingClientRect().top,coordy.offsetHeight,coordz.offsetHeight,coordy.clientHeight,coordz.clientHeight,coordy.clientTop,coordz.clientTop);
+*/
 
+navigator.permissions.query({name: "clipboard-write"}).then(result => {
+    if (result.state == "granted" || result.state == "prompt") {
+        console.log("clipboard write erlaubt");
+    }
+});
+/*
+navigator.clipboard
+    .writeText("hallo Welt")
+    .then(() => {
+        console.log("clipboard successfully set ");
+    })
+    .catch(() => {
+        console.log("clipboard write failed");
+    });
+*/
 //coordz.setAttribute("top", coordy.getBoundingClientRect().top);
 //coordz.style.top =  "15px";
 

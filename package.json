@@ -4,7 +4,7 @@
   "description": "Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts",
   "scripts": {
     "build": "parcel build index.html",
-    "dev": "parcel index.html --open",
+    "dev": "parcel index.html --https --open",
     "start": "npm run build && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -238,44 +238,45 @@ function rechnen() {
         console.log("Iyys= " + quer.Iy_s);
 
         const Normalkraft = document.getElementById("N_kraft").value.replace(/,/g, '.');
-        const My = document.getElementById("My").value.replace(/,/g, '.');
-        const Mz = document.getElementById("Mz").value.replace(/,/g, '.');
+        const My = 100.0 * document.getElementById("My").value.replace(/,/g, '.');   // in kNcm
+        const Mz = 100.0 * document.getElementById("Mz").value.replace(/,/g, '.');   // in kNcm
+
         const nenner = quer.Iy_s * quer.Iz_s - quer.Iyz_s * quer.Iyz_s;
         let yi, zi, sigma;
         for (let i = 0; i < npkte; i++) {
             yi = y[i] - quer.ys;
             zi = z[i] - quer.zs;
             sigma = Normalkraft / quer.area + ((quer.Iz_s * zi - quer.Iyz_s * yi) * My - (quer.Iy_s * yi - quer.Iyz_s * zi) * Mz) / nenner;
-            console.log("sigma", yi, zi, sigma);
+            //console.log("sigma", yi, zi, sigma);
             table.rows[i + 1].cells[3].innerText = sigma.toFixed(3);
         }
-
-        const vector = [];
-        vector.push(quer);
-        console.log("vector", vector[0].area);
         /*
-                xs.cellText(3, 6, quer.ys.toFixed(2) + ' m');
-                xs.cellText(4, 6, quer.zs.toFixed(2));
-                xs.cellText(5, 6, quer.area.toFixed(2));
-                xs.cellText(6, 6, quer.Iy_s.toFixed(2));
-                xs.cellText(7, 6, quer.Iz_s.toFixed(2));
-                xs.cellText(8, 6, quer.Iyz_s.toFixed(2));
-                xs.cellText(9, 6, quer.Imax.toFixed(2));
-                xs.cellText(10, 6, quer.Imin.toFixed(2));
-                xs.cellText(11, 6, (quer.phi * 180.0 / Math.PI).toFixed(2) + "°");
-        
-                xs.cellText(3, 5, 'ys = ');
-                xs.cellText(4, 5, 'zs = ');
-                xs.cellText(5, 5, 'Fläche = ');
-                xs.cellText(6, 5, 'Iy_s = ');
-                xs.cellText(7, 5, 'Iz_s = ');
-                xs.cellText(8, 5, 'Iyz_s = ');
-                xs.cellText(9, 5, 'I11 = ');
-                xs.cellText(10, 5, 'I22 = ');
-                xs.cellText(11, 5, 'phi_h = ');
-        
-                xs.reRender();
-        */
+                const vector = [];
+                vector.push(quer);
+                console.log("vector", vector[0].area);
+
+                        xs.cellText(3, 6, quer.ys.toFixed(2) + ' m');
+                        xs.cellText(4, 6, quer.zs.toFixed(2));
+                        xs.cellText(5, 6, quer.area.toFixed(2));
+                        xs.cellText(6, 6, quer.Iy_s.toFixed(2));
+                        xs.cellText(7, 6, quer.Iz_s.toFixed(2));
+                        xs.cellText(8, 6, quer.Iyz_s.toFixed(2));
+                        xs.cellText(9, 6, quer.Imax.toFixed(2));
+                        xs.cellText(10, 6, quer.Imin.toFixed(2));
+                        xs.cellText(11, 6, (quer.phi * 180.0 / Math.PI).toFixed(2) + "°");
+
+                        xs.cellText(3, 5, 'ys = ');
+                        xs.cellText(4, 5, 'zs = ');
+                        xs.cellText(5, 5, 'Fläche = ');
+                        xs.cellText(6, 5, 'Iy_s = ');
+                        xs.cellText(7, 5, 'Iz_s = ');
+                        xs.cellText(8, 5, 'Iyz_s = ');
+                        xs.cellText(9, 5, 'I11 = ');
+                        xs.cellText(10, 5, 'I22 = ');
+                        xs.cellText(11, 5, 'phi_h = ');
+
+                        xs.reRender();
+*/
         const tr = new CTrans(ymin, zmin, ymax, zmax);
 
         for (let i = 0; i < npkte; i++) {
@@ -329,22 +330,22 @@ function rechnen() {
 
         const svg = d3.select("#dataviz_area")
 
-        .on("mousemove", function (event) {
-            const vec = d3.pointer(event);
-            const coordy = document.getElementById("cursor_coordy");
-            const coordz = document.getElementById("cursor_coordz");
-            //let yp = Number(vec[0]) + 10 + svgBox.getBoundingClientRect().left;
-            //let zp = Number(vec[1]) - 20 + svgBox.getBoundingClientRect().top;
-            const yp = event.pageX + 10;
-            const zp = event.pageY - 20;
-            const y = (tr.yWorld(vec[0])).toFixed(1);
-            const z = (tr.zWorld(vec[1])).toFixed(1);
-            //console.log("mouse move1", y );
-            coordy.innerText = "y:" + y;
-            coordz.innerText = "z:" + z;
-            //console.log("vec", vec, vec[0], vec[1], yp, zp, event.pageX, event.pageY,"|",svgBox.getBoundingClientRect().left);
-            //return tooltip.style("top", zp + "px").style("left", yp + "px");
-        });
+            .on("mousemove", function (event) {
+                const vec = d3.pointer(event);
+                const coordy = document.getElementById("cursor_coordy");
+                const coordz = document.getElementById("cursor_coordz");
+                //let yp = Number(vec[0]) + 10 + svgBox.getBoundingClientRect().left;
+                //let zp = Number(vec[1]) - 20 + svgBox.getBoundingClientRect().top;
+                const yp = event.pageX + 10;
+                const zp = event.pageY - 20;
+                const y = (tr.yWorld(vec[0])).toFixed(1);
+                const z = (tr.zWorld(vec[1])).toFixed(1);
+                //console.log("mouse move1", y );
+                coordy.innerText = "y:" + y;
+                coordz.innerText = "z:" + z;
+                //console.log("vec", vec, vec[0], vec[1], yp, zp, event.pageX, event.pageY,"|",svgBox.getBoundingClientRect().left);
+                //return tooltip.style("top", zp + "px").style("left", yp + "px");
+            });
 
 
         svg.selectAll("circle").remove(); // Kreise entfernen aus früheren Berechnungen damit Tooltip funktioniert
@@ -352,28 +353,6 @@ function rechnen() {
         svg.selectAll("polygon").remove();
         svg.selectAll("text").remove();
 
-        /*
-                svg.append("circle")
-                    .attr("cx", 0).attr("cy", 0).attr("r", 40).style("fill", "blue");
-                svg.append("circle")
-                    .attr("cx", 140).attr("cy", 70).attr("r", 40).style("fill", "red");
-                svg.append("circle")
-                    .attr("cx", 900).attr("cy", 900).attr("r", 40).style("fill", "green");
-        
-                svg.append("line")
-                    .attr("x1", 0)
-                    .attr("x2", 690)
-                    .attr("y1", 0)
-                    .attr("y2", 990)
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 4)
-                    .attr("marker-end", "url(#arrow)");
-        
-                let yy = 700;
-                svg.append("text").attr("x", 200).attr("y", yy).text("Hallo Welt").style("font-size", 20);
-        
-                console.log('str= ', str);
-        */
         svg.append('polygon')
             .attr('points', str)
             .attr('stroke', "green")
