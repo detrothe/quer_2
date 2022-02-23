@@ -84,7 +84,8 @@ body {
     width: 100%;
     height: 100px;
     background-color: rgb(110, 194, 228);
-    padding: 5px
+    padding: 5px;
+    overflow-y: auto;
 }
 
 td, th {
@@ -104,6 +105,11 @@ h1 {
 */
 button {
     font-size: 1em;
+}
+
+.buttonTable {
+    font-size: 1em;
+    width: 8em;
 }
 
 input {
@@ -228,6 +234,7 @@ input:valid {
 }
 
 #cursor_coordy {
+    /*display: inline-block;*/
     position: relative;
     top: 10px;
     left: 10px;
@@ -245,6 +252,7 @@ input:valid {
 }
 
 #cursor_coordz {
+    /*display: inline-block;*/
     position: relative;
     top: -15px;
     left: calc(10px + 4em);

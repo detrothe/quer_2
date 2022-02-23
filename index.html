@@ -10,6 +10,12 @@
     <meta name="application-name" content="polyquerschnitt">
 
     <link href="./styles/main.css" rel="stylesheet" type="text/css">
+    <link href="./styles/contextMenu.css" rel="stylesheet" type="text/css">
+
+    <!-- <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css">  -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,300">  -->
+
     <!--
     <script src="https://d3js.org/d3.v7.min.js"></script>
  -->
@@ -30,11 +36,11 @@
         <h2>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h2>
 
         <div id="infoBox"></div>
-        <label for="readFile"> Daten einlesen: &nbsp; </label><input type="file" id="readFile" name="file"/>
+        <!-- <label for="readFile"> Daten einlesen: &nbsp; </label><input type="button" id="readFile" name="file"/> -->
         <!--  style="display:none" -->
-        <!-- <output id="list"></output> -->
-        <label> Daten speichern : &nbsp;</label>
-        <button type="button" id="saveFile">Dateiname eingeben</button>
+
+        <button type="button"  id="readFile">Daten einlesen</button>
+        <button type="button"  id="saveFile">Daten speichern</button>
 
 
     </div>
@@ -45,12 +51,26 @@
 
             <p>Hinweis: gib zuerst die Anzahl Punkte ein<br> und drücke dann den Button <i>resize Tabelle</i></p>
 
-            <label>Anzahl Punkte : </label>
+            <label>Anzahl Punkte :</label>
             <input type="number" id="input_pkte" name="npkte" value="4">
-            <button type="button" id="resize">resize Tabelle</button>
-            <button type="button" id="clearTable">clear Tabelle</button>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            <button type="button" id="rechnen">Rechnen</button>
+
+            <table>
+                <tbody>
+                <tr>
+                    <td>
+                        <button type="button" class="buttonTable" id="resize">resize Tabelle</button>
+                    </td>
+                    <td>
+                        <button type="button" class="buttonTable" id="clearTable">clear Tabelle</button>
+                    </td>
+                    <td>
+                        <button type="button" class="buttonTable" id="rechnen">Rechnen</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+
             <!-- &nbsp;&nbsp;&nbsp;&nbsp;
             <input type="file" id="files" name="files[]" multiple/>
             <output id="list"></output>
@@ -103,47 +123,47 @@
 
                 <tbody>
                 <tr>
-                    <td class="zelle1">y<sub>s</sub> =</td>
+                    <td class="zelle1">y<sub>s</sub>=</td>
                     <td class="zelle" id="ys"></td>
                     <td class="zelle">cm</td>
                 </tr>
                 <tr>
-                    <td class="zelle1">z<sub>s</sub> =</td>
+                    <td class="zelle1">z<sub>s</sub>=</td>
                     <td class="zelle" id="zs"></td>
                     <td class="zelle">cm</td>
                 </tr>
                 <tr>
-                    <td class="zelle1">A =</td>
+                    <td class="zelle1">A=</td>
                     <td class="zelle" id="area"></td>
                     <td class="zelle">cm²</td>
                 </tr>
                 <tr>
-                    <td class="zelle1">I<sub>y,s</sub> =</td>
+                    <td class="zelle1">I<sub>y,s</sub>=</td>
                     <td class="zelle" id="Iys"></td>
                     <td class="zelle">cm<sup>4</sup></td>
                 </tr>
                 <tr>
-                    <td class="zelle1">I<sub>z,s</sub> =</td>
+                    <td class="zelle1">I<sub>z,s</sub>=</td>
                     <td class="zelle" id="Izs"></td>
                     <td class="zelle">cm<sup>4</sup></td>
                 </tr>
                 <tr>
-                    <td class="zelle1">I<sub>yz,s</sub> =</td>
+                    <td class="zelle1">I<sub>yz,s</sub>=</td>
                     <td class="zelle" id="Iyzs"></td>
                     <td class="zelle">cm<sup>4</sup></td>
                 </tr>
                 <tr>
-                    <td class="zelle1">I<sub>11</sub> =</td>
+                    <td class="zelle1">I<sub>11</sub>=</td>
                     <td class="zelle" id="I11"></td>
                     <td class="zelle">cm<sup>4</sup></td>
                 </tr>
                 <tr>
-                    <td class="zelle1">I<sub>22</sub> =</td>
+                    <td class="zelle1">I<sub>22</sub>=</td>
                     <td class="zelle" id="I22"></td>
                     <td class="zelle">cm<sup>4</sup></td>
                 </tr>
                 <tr>
-                    <td class="zelle1">&phi;<sub>h</sub> =</td>
+                    <td class="zelle1">&phi;<sub>h</sub>=</td>
                     <td class="zelle" id="phi_h"></td>
                     <td class="zelle">°</td>
                 </tr>
@@ -153,12 +173,13 @@
     </div>
     <div class="right" style="background-color:#ccc;">
 
+
         <div id="my-svg">
+
             <div id="cursor_coordy">y:</div>
             <div id="cursor_coordz">z:</div>
 
             <svg id="dataviz_area" height=1000 width=700>
-
 
                 <defs>
                     <!-- arrowhead marker definition -->
@@ -192,9 +213,23 @@
     </div>
 
     <div class="footer">
-        <p>&copy; Detlef Rothe, 20-Feb-2022, statikverstehen.de</p>
+        <p>&copy; Detlef Rothe, 22-Feb-2022, statikverstehen.de</p>
     </div>
 </div>
+
+<nav id="context-menu" class="context-menu">
+    <ul class="context-menu__items">
+        <li class="context-menu__item">
+            <a href="#" class="context-menu__link" data-action="View"><i class="fa fa-eye"></i> View Task</a>
+        </li>
+        <li class="context-menu__item">
+            <a href="#" class="context-menu__link" data-action="Edit"><i class="fa fa-edit"></i> Edit Task</a>
+        </li>
+        <li class="context-menu__item">
+            <a href="#" class="context-menu__link" data-action="Delete"><i class="fa fa-times"></i> Delete Task</a>
+        </li>
+    </ul>
+</nav>
 
 
 <!--

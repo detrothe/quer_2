@@ -4,8 +4,10 @@
 
 import './listener.js';
 import './dateien.js';
+import './contextMenu.js';
 import * as d3 from "d3";
 import DetectOS from 'detectos.js'
+import {CQuer_polygon} from "./calc/quer1";
 
 
 //export var xs; // the spreadsheet
@@ -58,7 +60,7 @@ export const app = {
 
 const Detect = new DetectOS();
 
-const infoBox = document.getElementById("infoBox");
+export const infoBox = document.getElementById("infoBox");
 infoBox.innerHTML = "clientwidth=" + myScreen.clientWidth + "&nbsp;,&nbsp;&nbsp;    clientheight=" + myScreen.clientHeight;
 infoBox.innerHTML += "<br>Browser: " + Detect.browser + " Version " + Detect.version;
 infoBox.innerHTML += "<br>OS: " + Detect.OS + " , isMac: " + app.isMac;
@@ -68,36 +70,36 @@ if (app.hasFSAccess) {
     infoBox.innerHTML += "<br>showSaveFilePicker wird NICHT unterstützt";
 }
 
+/**
+ * Listens for click events.
+ */
+/*
+document.addEventListener("contextmenu", function (e) {
+    console.log("right click", e);
+
+    e.preventDefault();
+});
+*/
 
 const elem = document.getElementById("input_pkte");
 //elem.setAttribute( 'value','8');
 elem.value = 10;
 
-// Matrix mit 4 Zeilen und 2 Spalten
-const arr = Array.from(Array(4), () => new Array(2).fill(0.0));
 /*
+// Matrix mit 4 Zeilen und 2 Spalten  nicht löschen
+const arr = Array.from(Array(4), () => new Array(2).fill(0.0));
+
 arr[0][0] ='11';arr[0][1] ='12';
 arr[1][0] ='21';arr[1][1] ='22';
 arr[2][0] ='31';arr[2][1] ='32';
 arr[3][0] ='41';arr[3][1] ='42';
-*/
 
 console.info(arr);
+*/
 
 console.log("height=", myScreen.clientHeight);
 console.log("width =", myScreen.clientWidth);
-/*
-var data = [
-    {"date": '2013-01-01', "close": 45},
-    {"date": '2013-02-01', "close": 50},
-    {"date": '2013-03-01', "close": 55},
-    {"date": '2013-04-01', "close": 50},
-    {"date": '2013-05-01', "close": 45},
-    {"date": '2013-06-01', "close": 50},
-    {"date": '2013-07-01', "close": 50},
-    {"date": '2013-08-01', "close": 52}
-]
-*/
+
 
 const polygon = {};
 const punkte = []
@@ -125,7 +127,7 @@ function tabulate(data, columns) {
     console.log('columns', columns);
     console.log("data", data);
 
-    const table = d3.select('#input-container').append('table').style('border', 'solid').style('border-spacing', '0px').style('padding', "10px").attr("id", "polygonTable")
+    const table = d3.select('#input-container').append('table').style('border', 'solid').style('border-spacing', '0px').style('padding', "10px").attr("id", "polygonTable").attr("class", "tasks")
     const thead = table.append('thead')
     const tbody = table.append('tbody');
 
@@ -165,11 +167,9 @@ function tabulate(data, columns) {
         .on('keydown', function (ev) {
                 // console.log("in FOCUS",ev.keyCode);
                 // trap the return and space keys being pressed
-                if (ev.keyCode === 32) {
+                if (ev.keyCode === 32) {    // Leertaste
                     ev.preventDefault();
-                }
-
-                if (ev.keyCode === 13) {
+                } else if (ev.keyCode === 13) {    // return
                     ev.preventDefault();
 
                     const el = document.getElementById("input_pkte");
@@ -179,13 +179,13 @@ function tabulate(data, columns) {
                         const tabelle = document.getElementById("polygonTable");
                         //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col]);
                         //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells.item(selectedCellPoly.col));
-                        console.log("tabelle", tabelle.classList);
+                        //console.log("tabelle", tabelle.classList);
                         //tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].removeClass("highlight");
                         const row = selectedCellPoly.row;
                         const col = selectedCellPoly.col;
                         let str = 'pt-' + row + '-' + col;
                         const elem = document.getElementById(str);
-                        console.log("ID", elem.id, elem.classList);
+                        console.log("<RETURN> ID", elem.id, elem.classList);
                         elem.classList.remove('highlight');
                         //$("#polygonTable td").removeClass("highlight");
                         if (col == 1) {
@@ -203,10 +203,39 @@ function tabulate(data, columns) {
                         elemNeu.innerText = "";
                         elemNeu.focus();
                         const evt = new Event("mousedown", {"bubbles": true, "cancelable": false});
+                        evt.button = 0;     // linke Maustaste
                         elemNeu.dispatchEvent(evt);
 
                     }
 
+                }
+            }
+        )
+        .on('mousedown', function (ev) {
+                console.log("mousedown",ev.which, ev.button);
+                if (ev.which === 3) {               // rechte Maustaste
+                    console.log("rechte Maustaste");
+                    //ev.preventDefault();
+                } else if (ev.button === 0) {      // linke Maustaste
+                    if (selectedCellPoly.isSelected) {
+                        //selectedCellPoly.activatedMember.removeClass("highlight");
+                        console.log("is selected", $(this).parent());
+
+                        $("#polygonTable td").removeClass("highlight");
+                        // $("#polygonTable").addClass("normal");
+                    }
+                    const row = Number($(this).parent().index()) + 1;
+                    const col = $(this).index();
+                    const activatedMember = $(ev.target).closest("td");
+                    activatedMember.addClass("highlight");
+                    let wert = activatedMember.text();
+
+                    console.log("event", row, col, wert);
+                    selectedCellPoly.row = row;
+                    selectedCellPoly.col = col;
+                    selectedCellPoly.wert = wert;
+                    selectedCellPoly.activatedMember = activatedMember;
+                    selectedCellPoly.isSelected = true;
                 }
             }
         )
@@ -217,6 +246,7 @@ function tabulate(data, columns) {
 
 // render the tables
 tabulate(polygon.punkte, ['Punkt', 'y [cm]', 'z [cm]', 'sigma [kN/cm²]']); // 4 column table
+
 //tabulate(data, ['date']); // table with only date column
 //tabulate(data, ['close']); // table with only close column
 /*
@@ -296,28 +326,35 @@ for (let i = 1; i < tabelle.rows.length; i++) {
     //console.log(objCells.item(0));
 }
 //--------------------------------------------------------------------
+/*
 const polytable = $("#polygonTable");
+
 polytable.find("td").mousedown(function (ev) {
-    if (selectedCellPoly.isSelected) {
-        //selectedCellPoly.activatedMember.removeClass("highlight");
-        console.log("is selected", $(this).parent());
 
-        $("#polygonTable td").removeClass("highlight");
-        // $("#polygonTable").addClass("normal");
+    if (ev.which === 1) {
+        if (selectedCellPoly.isSelected) {
+            //selectedCellPoly.activatedMember.removeClass("highlight");
+            console.log("is selected", $(this).parent());
+
+            $("#polygonTable td").removeClass("highlight");
+            // $("#polygonTable").addClass("normal");
+        }
+        const row = Number($(this).parent().index()) + 1;
+        const col = $(this).index();
+        const activatedMember = $(ev.target).closest("td");
+        activatedMember.addClass("highlight");
+        let wert = activatedMember.text();
+
+        console.log("event", row, col, wert);
+        selectedCellPoly.row = row;
+        selectedCellPoly.col = col;
+        selectedCellPoly.wert = wert;
+        selectedCellPoly.activatedMember = activatedMember;
+        selectedCellPoly.isSelected = true;
     }
-    const row = Number($(this).parent().index()) + 1;
-    const col = $(this).index();
-    const activatedMember = $(ev.target).closest("td");
-    activatedMember.addClass("highlight");
-    let wert = activatedMember.text();
-
-    console.log("event", row, col, wert);
-    selectedCellPoly.row = row;
-    selectedCellPoly.col = col;
-    selectedCellPoly.wert = wert;
-    selectedCellPoly.activatedMember = activatedMember;
-    selectedCellPoly.isSelected = true;
+    ev.preventDefault();
 });
+*/
 //--------------------------------------------------------------------
 
 const table = $("#schnittgroessen_table");
@@ -404,12 +441,21 @@ const coordz = document.getElementById("cursor_coordz");
 
 console.log("coordyz",coordy.getBoundingClientRect().top,coordz.getBoundingClientRect().top,coordy.offsetHeight,coordz.offsetHeight,coordy.clientHeight,coordz.clientHeight,coordy.clientTop,coordz.clientTop);
 */
+try {
+    navigator.permissions.query({name: "clipboard-write"}).then(result => {
+        if ('state' in result) {
+            if (result.state == "granted" || result.state == "prompt") {
+                console.log("clipboard write erlaubt");
+                infoBox.innerHTML += "<br>clipboard write erlaubt";
+            } else {
+                infoBox.innerHTML += "<br>clipboard write NICHT erlaubt";
+            }
+        }
+    });
+} catch (error) {
+    infoBox.innerHTML += "<br>clipboard-write NICHT implementiert";
+}
 
-navigator.permissions.query({name: "clipboard-write"}).then(result => {
-    if (result.state == "granted" || result.state == "prompt") {
-        console.log("clipboard write erlaubt");
-    }
-});
 /*
 navigator.clipboard
     .writeText("hallo Welt")
