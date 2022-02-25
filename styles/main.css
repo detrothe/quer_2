@@ -78,6 +78,7 @@ body {
     }
 }
 
+/*-----------------------------------------------------------------------------------------*/
 
 #infoBox {
     /*position: absolute;*/
@@ -183,6 +184,8 @@ input:valid {
     height: 50px; */
 }
 
+/*-----------------------------------------------------------------------------------------*/
+
 #schnittgroessen_table td {
     background-color: rgb(200, 200, 200);
 }
@@ -190,6 +193,7 @@ input:valid {
 #schnittgroessen_table td.selected {
     background-color: green;
 }
+/*-----------------------------------------------------------------------------------------*/
 
 /*
 #x-spreadsheet-demo {
@@ -274,12 +278,18 @@ input:valid {
 }
 
 #polygonTable td {
-    background-color: rgb(200, 200, 200);
+    background-color: rgb(250, 250, 250);
     white-space: nowrap;
 }
 
 #polygonTable td.highlight {
     background-color: orange;
+    color: darkslateblue;
+    white-space: nowrap;
+}
+
+#polygonTable td.selected {
+    background-color: darkred;
     color: red;
     white-space: nowrap;
 }

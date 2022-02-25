@@ -4,7 +4,7 @@
 
 import './listener.js';
 import './dateien.js';
-import './contextMenu.js';
+import {init_contextmenu} from './contextMenu.js';
 import * as d3 from "d3";
 import DetectOS from 'detectos.js'
 import {CQuer_polygon} from "./calc/quer1";
@@ -12,14 +12,19 @@ import {CQuer_polygon} from "./calc/quer1";
 
 //export var xs; // the spreadsheet
 
-const selectedCellPoly = {
+export const selectedCellPoly = {
     isSelected: false,
     selectedCellRow: -1,
     selectedCellCol: -1,
     col: -1,
     row: -1,
     wert: 0,
-    activatedMember: null
+    activatedMember: null,
+    selColY: [],
+    selColZ: [],
+    startRowIndex: null,
+    startCellIndex: null
+
 };
 
 export const myScreen = {
@@ -55,6 +60,8 @@ export const app = {
     hasFSAccess: 'chooseFileSystemEntries' in window ||
         'showOpenFilePicker' in window,
     isMac: navigator.userAgent.includes('Mac OS X'),
+
+    npkte: 0,
 };
 
 
@@ -70,6 +77,13 @@ if (app.hasFSAccess) {
     infoBox.innerHTML += "<br>showSaveFilePicker wird NICHT unterstützt";
 }
 
+
+console.log("height=", myScreen.clientHeight);
+console.log("width =", myScreen.clientWidth);
+
+
+init_contextmenu();
+
 /**
  * Listens for click events.
  */
@@ -84,6 +98,8 @@ document.addEventListener("contextmenu", function (e) {
 const elem = document.getElementById("input_pkte");
 //elem.setAttribute( 'value','8');
 elem.value = 10;
+app.npkte = 10;
+
 
 /*
 // Matrix mit 4 Zeilen und 2 Spalten  nicht löschen
@@ -97,9 +113,6 @@ arr[3][0] ='41';arr[3][1] ='42';
 console.info(arr);
 */
 
-console.log("height=", myScreen.clientHeight);
-console.log("width =", myScreen.clientWidth);
-
 
 const polygon = {};
 const punkte = []
@@ -107,6 +120,9 @@ const punkte = []
 polygon.punkte = punkte;
 
 for (let i = 1; i <= 10; i++) {
+    selectedCellPoly.selColY.push(false);
+    selectedCellPoly.selColZ.push(false);
+
     let pkt = i;
     let y = 10 + i;
     let z = 20 + i;
@@ -186,7 +202,11 @@ function tabulate(data, columns) {
                         let str = 'pt-' + row + '-' + col;
                         const elem = document.getElementById(str);
                         console.log("<RETURN> ID", elem.id, elem.classList);
-                        elem.classList.remove('highlight');
+                        elem.classList.remove('highlight');  // alle selektierte Zellen löschen
+                        for (let i = 0; i < npkte; i++) {
+                            selectedCellPoly.selColY[i] = false;
+                            selectedCellPoly.selColZ[i] = false;
+                        }
                         //$("#polygonTable td").removeClass("highlight");
                         if (col == 1) {
                             str = 'pt-' + row + '-2';
@@ -212,7 +232,7 @@ function tabulate(data, columns) {
             }
         )
         .on('mousedown', function (ev) {
-                console.log("mousedown",ev.which, ev.button);
+                console.log("mousedown", ev.which, ev.button);
                 if (ev.which === 3) {               // rechte Maustaste
                     console.log("rechte Maustaste");
                     //ev.preventDefault();
@@ -220,22 +240,92 @@ function tabulate(data, columns) {
                     if (selectedCellPoly.isSelected) {
                         //selectedCellPoly.activatedMember.removeClass("highlight");
                         console.log("is selected", $(this).parent());
+                        const el = document.getElementById("input_pkte");
+                        if (el) {
+                            const npkte = el.value;
+                            $("#polygonTable td").removeClass("highlight");
+                            for (let i = 0; i < npkte; i++) {
+                                selectedCellPoly.selColY[i] = false;
+                                selectedCellPoly.selColZ[i] = false;
+                            }
+                        }
 
-                        $("#polygonTable td").removeClass("highlight");
-                        // $("#polygonTable").addClass("normal");
                     }
+                    console.log("cell", $(this), $(this).parent().index());
                     const row = Number($(this).parent().index()) + 1;
                     const col = $(this).index();
-                    const activatedMember = $(ev.target).closest("td");
-                    activatedMember.addClass("highlight");
-                    let wert = activatedMember.text();
+                    if (col === 1 || col === 2) {
+                        const activatedMember = $(ev.target).closest("td");
+                        activatedMember.addClass("highlight");
+                        let wert = activatedMember.text();
 
-                    console.log("event", row, col, wert);
-                    selectedCellPoly.row = row;
-                    selectedCellPoly.col = col;
-                    selectedCellPoly.wert = wert;
-                    selectedCellPoly.activatedMember = activatedMember;
-                    selectedCellPoly.isSelected = true;
+                        //console.log("event", row, col, wert);
+                        selectedCellPoly.row = row;
+                        selectedCellPoly.col = col;
+                        selectedCellPoly.wert = wert;
+                        selectedCellPoly.activatedMember = activatedMember;
+                        selectedCellPoly.isSelected = true;
+                        if (col === 1) selectedCellPoly.selColY[row - 1] = true;
+                        else if (col === 2) selectedCellPoly.selColZ[row - 1] = true;
+                        selectedCellPoly.startRowIndex = row;
+                        selectedCellPoly.startCellIndex = col;
+                    }
+                }
+            }
+        )
+        .on('mousemove', function (ev) {
+                //console.log("polytable mouseover",ev.buttons,ev);
+                if (ev.buttons === 1) {
+                    const row = Number($(this).parent().index()) + 1;
+                    const col = $(this).index();
+                    if (col === 1 || col === 2) {
+                        const activatedMember = $(ev.target).closest("td");
+                        activatedMember.addClass("highlight");
+                        selectedCellPoly.isSelected = true;
+                        console.log("column", col, row);
+                        if (col === 1) selectedCellPoly.selColY[row - 1] = true;
+                        else if (col === 2) selectedCellPoly.selColZ[row - 1] = true;
+
+                        const cellIndex = col;
+                        const rowIndex = row;
+
+                        let rowStart, rowEnd, cellStart, cellEnd;
+
+                        if (rowIndex < selectedCellPoly.startRowIndex) {
+                            rowStart = rowIndex;
+                            rowEnd = selectedCellPoly.startRowIndex;
+                        } else {
+                            rowStart = selectedCellPoly.startRowIndex;
+                            rowEnd = rowIndex;
+                        }
+
+                        if (cellIndex < selectedCellPoly.startCellIndex) {
+                            cellStart = cellIndex;
+                            cellEnd = selectedCellPoly.startCellIndex;
+                        } else {
+                            cellStart = selectedCellPoly.startCellIndex;
+                            cellEnd = cellIndex;
+                        }
+                        // console.log("startend", rowStart, rowEnd, col, row, rowStart, rowEnd, cellStart, cellEnd);
+
+                        $("#polygonTable td").removeClass("highlight");
+                        for (let i = 0; i < app.npkte; i++) {
+                            selectedCellPoly.selColY[i] = false;
+                            selectedCellPoly.selColZ[i] = false;
+                        }
+
+                        const tabelle = document.getElementById("polygonTable");
+                        for (let i = rowStart; i <= rowEnd; i++) {
+                            //const rowCells = table.find("tr").eq(i).find("td");
+                            for (let j = cellStart; j <= cellEnd; j++) {
+                                //rowCells.eq(j).addClass("selected");
+                                tabelle.rows.item(i).cells.item(j).classList.add("highlight");
+                                if (j === 1) selectedCellPoly.selColY[i - 1] = true;
+                                if (j === 2) selectedCellPoly.selColZ[i - 1] = true;
+
+                            }
+                        }
+                    }
                 }
             }
         )
@@ -316,8 +406,8 @@ for (let i = 1; i < tabelle.rows.length; i++) {
     const objCells = tabelle.rows.item(i).cells;
     objCells.item(0).contentEditable = false;
     objCells.item(0).style.textAlign = "center";
-    objCells.item(1).style.backgroundColor = "#FFFFFF";
-    objCells.item(2).style.backgroundColor = "#FFFFFF";
+    //objCells.item(1).style.backgroundColor = "#FFFFFF";
+    //objCells.item(2).style.backgroundColor = "#FFFFFF";
     objCells.item(1).id = "pt-" + i + "-" + 1;
     objCells.item(2).id = "pt-" + i + "-" + 2;
     objCells.item(3).contentEditable = false;

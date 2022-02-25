@@ -1,4 +1,4 @@
-//import { xs } from './index';
+import {app, selectedCellPoly} from './index';
 import {CQuer_polygon} from './calc/quer1.js';
 import {CTrans} from './trans.js';
 //import "d3";
@@ -54,17 +54,25 @@ export function resize_polyTabelle() {
     const elem = document.getElementById("input_pkte");
     if (elem) {
         const npkte = elem.value;
+        app.npkte = npkte;
         const table = document.getElementById("polygonTable");
         let nzeilen = table.rows.length - 1;  // header abziehen
 
         if (nzeilen > npkte) {
             for (let i = 1; i <= nzeilen - npkte; i++) {
                 table.deleteRow(-1);
+                //console.log("selRow",selectedCellPoly.selRow);
+                selectedCellPoly.selColY.length -= 1;
+                selectedCellPoly.selColZ.length -= 1;
             }
         }
         if (npkte > nzeilen) {
 
             for (let i = nzeilen + 1; i <= npkte; i++) {
+                selectedCellPoly.selColY.push(false);
+                selectedCellPoly.selColZ.push(false);
+                //console.log("selRow",selectedCellPoly.selRow);
+
                 // Insert a row at the end of the table
                 let newRow = table.insertRow(-1);
 
@@ -191,24 +199,26 @@ function rechnen() {
                 }
         */
         let table = document.getElementById("polygonTable");
-        for (let i in table.rows) {
-            let row = table.rows[i]
+        for (let tableRow in table.rows) {
+            let row = table.rows[tableRow]
+            let i = Number(tableRow);
             //console.log('i=', i, '| ', row);
             //iterate through rows
             //rows would be accessed using the "row" variable assigned in the for loop
-            for (let j in row.cells) {
-                let col = row.cells[j]
+            for (let tableCell in row.cells) {
+                let col = row.cells[tableCell]
+                let j = Number(tableCell);
                 //console.log('i=',i,' j=',j,' inner| ',col.innerHTML);
 
                 if (i > 0) {
                     if (j == 1) {
-                        table.rows.item(i).cells.item(j).style.backgroundColor = "white";
-                        table.rows.item(i).cells.item(j).style.color = "black";
+                        table.rows.item(i).cells.item(j).classList.remove("highlight"); //      .style.backgroundColor = "white";
+                        //table.rows.item(i).cells.item(j).style.color = "black";
                         y[i - 1] = testNumber(col.innerText, i, j);
                     }
                     if (j == 2) {
-                        table.rows.item(i).cells.item(j).style.backgroundColor = "white";
-                        table.rows.item(i).cells.item(j).style.color = "black";
+                        table.rows.item(i).cells.item(j).classList.remove("highlight");
+                        //table.rows.item(i).cells.item(j).style.color = "black";
                         z[i - 1] = testNumber(col.innerText, i, j);
                     }
                 }
