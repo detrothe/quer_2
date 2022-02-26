@@ -1,4 +1,4 @@
-import {app, infoBox, selectedCellPoly} from './index';
+import {app, Detect, infoBox, selectedCellPoly} from './index';
 
 //(function () {
 
@@ -294,6 +294,12 @@ function menuItemListener(link) {
         let newClip = "";
         let wertInSpalte1 = false;
 
+        let newLine = null;
+        if ( Detect.OS === 'Windows') {
+            newLine = "\r\n";
+        } else {
+            newLine = "\n";
+        }
         const tabelle = document.getElementById("polygonTable");
 
         for (let i = 0; i < app.npkte; i++) {
@@ -306,9 +312,9 @@ function menuItemListener(link) {
             if (selectedCellPoly.selColZ[i]) {
                 let wert = tabelle.rows[i + 1].cells[2].innerText;
                 if (wertInSpalte1) newClip += "\t";
-                newClip += wert + "\n";
+                newClip += wert + newLine;
             } else {
-                if (wertInSpalte1) newClip += "\n";
+                if (wertInSpalte1) newClip += newLine;
             }
         }
 
@@ -319,6 +325,14 @@ function menuItemListener(link) {
         });
 
     } else if (link.getAttribute("data-action") === "insert") {
+
+        let newLine = null;
+        if ( Detect.OS === 'Windows') {
+            newLine = "\r\n";
+        } else {
+            newLine = "\n";
+        }
+
         // Zellwert in zuletzt geklickter Zelle
         let row = selectedCellPoly.row;
         let col = selectedCellPoly.col;
@@ -328,7 +342,7 @@ function menuItemListener(link) {
         navigator.clipboard.readText().then(function (clipText) {
             //console.log("clipText", clipText);
 
-            let zeilen = clipText.split("\n");
+            let zeilen = clipText.split(newLine);
             //console.log("zeilen", zeilen, zeilen.length);
 
             let i, j;

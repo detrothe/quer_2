@@ -65,7 +65,7 @@ export const app = {
 };
 
 
-const Detect = new DetectOS();
+export const Detect = new DetectOS();
 
 export const infoBox = document.getElementById("infoBox");
 infoBox.innerHTML = "clientwidth=" + myScreen.clientWidth + "&nbsp;,&nbsp;&nbsp;    clientheight=" + myScreen.clientHeight;
@@ -231,7 +231,7 @@ function tabulate(data, columns) {
                 }
             }
         )
-        .on('mousedown', function (ev) {
+        .on('pointerdown', function (ev) {
                 console.log("mousedown", ev.which, ev.button);
                 if (ev.which === 3) {               // rechte Maustaste
                     console.log("rechte Maustaste");
@@ -273,7 +273,7 @@ function tabulate(data, columns) {
                 }
             }
         )
-        .on('mousemove', function (ev) {
+        .on('pointermove', function (ev) {
                 //console.log("polytable mouseover",ev.buttons,ev);
                 if (ev.buttons === 1) {
                     const row = Number($(this).parent().index()) + 1;
@@ -282,7 +282,7 @@ function tabulate(data, columns) {
                         const activatedMember = $(ev.target).closest("td");
                         activatedMember.addClass("highlight");
                         selectedCellPoly.isSelected = true;
-                        console.log("column", col, row);
+                        //console.log("column", col, row);
                         if (col === 1) selectedCellPoly.selColY[row - 1] = true;
                         else if (col === 2) selectedCellPoly.selColZ[row - 1] = true;
 
