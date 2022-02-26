@@ -222,7 +222,7 @@ function tabulate(data, columns) {
                         elemNeu.classList.add('highlight');
                         elemNeu.innerText = "";
                         elemNeu.focus();
-                        const evt = new Event("mousedown", {"bubbles": true, "cancelable": false});
+                        const evt = new Event("pointerdown", {"bubbles": true, "cancelable": false});
                         evt.button = 0;     // linke Maustaste
                         elemNeu.dispatchEvent(evt);
 
