@@ -9,13 +9,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "@parcel/transformer-less": "^2.2.1",
-    "parcel": "^2.2.1"
+    "@parcel/transformer-less": "^2.4.1",
+    "parcel": "^2.4.1"
   },
   "author": "det",
   "license": "ISC",
   "dependencies": {
-    "d3": "^7.3.0",
+    "d3": "^7.4.3",
     "detectos.js": "^1.5.2"
   }
 }

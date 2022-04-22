@@ -23,8 +23,11 @@ export const selectedCellPoly = {
     selColY: [],
     selColZ: [],
     startRowIndex: null,
-    startCellIndex: null
-
+    startCellIndex: null,
+    pointerIsDown: false,
+    startx: 0,
+    starty: 0,
+    zelle: null
 };
 
 export const myScreen = {
@@ -58,7 +61,8 @@ export const app = {
         wordWrap: true,
     },
     hasFSAccess: 'chooseFileSystemEntries' in window ||
-        'showOpenFilePicker' in window,
+        'showOpenFilePicker' in window ||
+        'showSaveFilePicker' in window,
     isMac: navigator.userAgent.includes('Mac OS X'),
 
     npkte: 0,
@@ -180,105 +184,144 @@ function tabulate(data, columns) {
         .text(function (d) {
             return d.value;
         })
-        .on('keydown', function (ev) {
-                // console.log("in FOCUS",ev.keyCode);
-                // trap the return and space keys being pressed
-                if (ev.keyCode === 32) {    // Leertaste
+        .on('keydown', KEYDOWN)
+        .on('mousedown', MOUSEDOWN)
+
+        .on('mousemove', MOUSEMOVE)
+        /*
+        .on('mousemove', function MMOVE (ev) {
+                //console.log("polytable mouseover",ev.buttons,ev);
+                if (ev.buttons === 1) {
                     ev.preventDefault();
-                } else if (ev.keyCode === 13) {    // return
-                    ev.preventDefault();
-
-                    const el = document.getElementById("input_pkte");
-                    if (el) {
-                        const npkte = el.value;
-
-                        const tabelle = document.getElementById("polygonTable");
-                        //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col]);
-                        //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells.item(selectedCellPoly.col));
-                        //console.log("tabelle", tabelle.classList);
-                        //tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].removeClass("highlight");
-                        const row = selectedCellPoly.row;
-                        const col = selectedCellPoly.col;
-                        let str = 'pt-' + row + '-' + col;
-                        const elem = document.getElementById(str);
-                        console.log("<RETURN> ID", elem.id, elem.classList);
-                        elem.classList.remove('highlight');  // alle selektierte Zellen löschen
-                        for (let i = 0; i < npkte; i++) {
-                            selectedCellPoly.selColY[i] = false;
-                            selectedCellPoly.selColZ[i] = false;
-                        }
-                        //$("#polygonTable td").removeClass("highlight");
-                        if (col == 1) {
-                            str = 'pt-' + row + '-2';
-                        } else if (col == 2) {
-                            if (row < npkte) {
-                                str = 'pt-' + Number(row + 1) + '-1';
-                            } else {
-                                str = 'pt-1-1';
-                            }
-                        }
-
-                        const elemNeu = document.getElementById(str);
-                        elemNeu.classList.add('highlight');
-                        elemNeu.innerText = "";
-                        elemNeu.focus();
-                        const evt = new Event("pointerdown", {"bubbles": true, "cancelable": false});
-                        evt.button = 0;     // linke Maustaste
-                        elemNeu.dispatchEvent(evt);
-
-                    }
-
-                }
-            }
-        )
-        .on('pointerdown', function (ev) {
-                console.log("mousedown", ev.which, ev.button);
-                if (ev.which === 3) {               // rechte Maustaste
-                    console.log("rechte Maustaste");
-                    //ev.preventDefault();
-                } else if (ev.button === 0) {      // linke Maustaste
-                    if (selectedCellPoly.isSelected) {
-                        //selectedCellPoly.activatedMember.removeClass("highlight");
-                        console.log("is selected", $(this).parent());
-                        const el = document.getElementById("input_pkte");
-                        if (el) {
-                            const npkte = el.value;
-                            $("#polygonTable td").removeClass("highlight");
-                            for (let i = 0; i < npkte; i++) {
-                                selectedCellPoly.selColY[i] = false;
-                                selectedCellPoly.selColZ[i] = false;
-                            }
-                        }
-
-                    }
-                    console.log("cell", $(this), $(this).parent().index());
                     const row = Number($(this).parent().index()) + 1;
                     const col = $(this).index();
                     if (col === 1 || col === 2) {
                         const activatedMember = $(ev.target).closest("td");
                         activatedMember.addClass("highlight");
-                        let wert = activatedMember.text();
-
-                        //console.log("event", row, col, wert);
-                        selectedCellPoly.row = row;
-                        selectedCellPoly.col = col;
-                        selectedCellPoly.wert = wert;
-                        selectedCellPoly.activatedMember = activatedMember;
                         selectedCellPoly.isSelected = true;
+                        //console.log("column", col, row);
                         if (col === 1) selectedCellPoly.selColY[row - 1] = true;
                         else if (col === 2) selectedCellPoly.selColZ[row - 1] = true;
-                        selectedCellPoly.startRowIndex = row;
-                        selectedCellPoly.startCellIndex = col;
+
+                        const cellIndex = col;
+                        const rowIndex = row;
+
+                        let rowStart, rowEnd, cellStart, cellEnd;
+
+                        if (rowIndex < selectedCellPoly.startRowIndex) {
+                            rowStart = rowIndex;
+                            rowEnd = selectedCellPoly.startRowIndex;
+                        } else {
+                            rowStart = selectedCellPoly.startRowIndex;
+                            rowEnd = rowIndex;
+                        }
+
+                        if (cellIndex < selectedCellPoly.startCellIndex) {
+                            cellStart = cellIndex;
+                            cellEnd = selectedCellPoly.startCellIndex;
+                        } else {
+                            cellStart = selectedCellPoly.startCellIndex;
+                            cellEnd = cellIndex;
+                        }
+                        // console.log("startend", rowStart, rowEnd, col, row, rowStart, rowEnd, cellStart, cellEnd);
+                        console.log("APP.NPKTE", app.npkte,rowStart,rowEnd);
+                        $("#polygonTable td").removeClass("highlight");
+                        for (let i = 0; i < app.npkte; i++) {
+                            selectedCellPoly.selColY[i] = false;
+                            selectedCellPoly.selColZ[i] = false;
+                        }
+
+                        const tabelle = document.getElementById("polygonTable");
+                        for (let i = rowStart; i <= rowEnd; i++) {
+                            //const rowCells = table.find("tr").eq(i).find("td");
+                            for (let j = cellStart; j <= cellEnd; j++) {
+                                //rowCells.eq(j).addClass("selected");
+                                tabelle.rows.item(i).cells.item(j).classList.add("highlight");
+                                if (j === 1) selectedCellPoly.selColY[i - 1] = true;
+                                if (j === 2) selectedCellPoly.selColZ[i - 1] = true;
+
+                            }
+                        }
                     }
                 }
             }
         )
-        .on('pointermove', function (ev) {
-                //console.log("polytable mouseover",ev.buttons,ev);
-                if (ev.buttons === 1) {
+        */
+        .on("touchstart", function (ev) {
+            let touchobj = ev.changedTouches[0]; // erster Finger
+            selectedCellPoly.startx = parseInt(touchobj.clientX); // X/Y-Koordinaten relativ zum Viewport
+            selectedCellPoly.starty = parseInt(touchobj.clientY);
+            console.log("touchstart bei ClientX: " + selectedCellPoly.startx + "px ClientY: " + selectedCellPoly.starty + "px");
+
+
+            //ev.preventDefault();
+
+            //ev.preventDefault();
+            if (selectedCellPoly.isSelected) {
+                //selectedCellPoly.activatedMember.removeClass("highlight");
+                console.log("is selected", $(this).parent());
+                const el = document.getElementById("input_pkte");
+                if (el) {
+                    const npkte = el.value;
+                    $("#polygonTable td").removeClass("highlight");
+                    for (let i = 0; i < npkte; i++) {
+                        selectedCellPoly.selColY[i] = false;
+                        selectedCellPoly.selColZ[i] = false;
+                    }
+                }
+            }
+            console.log("cell", $(this), $(this).parent().index());
+            const row = Number($(this).parent().index()) + 1;
+            const col = $(this).index();
+            if (col === 1 || col === 2) {
+                const activatedMember = $(ev.target).closest("td");
+                activatedMember.addClass("highlight");
+                let wert = activatedMember.text();
+
+                //console.log("event", row, col, wert);
+                selectedCellPoly.row = row;
+                selectedCellPoly.col = col;
+                selectedCellPoly.wert = wert;
+                selectedCellPoly.activatedMember = activatedMember;
+                selectedCellPoly.isSelected = true;
+                if (col === 1) selectedCellPoly.selColY[row - 1] = true;
+                else if (col === 2) selectedCellPoly.selColZ[row - 1] = true;
+                selectedCellPoly.startRowIndex = row;
+                selectedCellPoly.startCellIndex = col;
+
+                const str = "pt-" + row + "-" + col;
+                selectedCellPoly.zelle = document.getElementById(str);
+
+                console.log("str", str, cellLeft, cellTop);
+                /*
+                                const elemNeu = document.getElementById(str);
+                                elemNeu.focus();
+                                const evt = new Event("mousedown", {"bubbles": true, "cancelable": false});
+                                evt.button = 0;     // linke Maustaste
+                                elemNeu.dispatchEvent(evt);
+                */
+                /*  Box zeichnen
+                cellLeft = (col - 1) * cellWidth;
+                cellTop = (row - 1) * cellHeight;
+                document.getElementById("polyCanvas").style.display = "block";
+                rechteck.attr("x", cellLeft + 'px');
+                rechteck.attr("y", cellTop + 'px');
+                rechteck.attr("width", cellWidth + 'px');
+                rechteck.attr("height", cellHeight + 'px');
+                */
+            }
+
+
+        })
+    /*
+            .on('touchmove', function (ev) {
+                    console.log("polytable touchmove", ev.changedTouches[0].identifier, ev.changedTouches[0].clientX, ev.changedTouches[0].clientY); //Number($(this).parent().index()),$(this).index());
+                    ev.preventDefault();
+                    //if (ev.buttons === 1) {
+                    //ev.preventDefault();
                     const row = Number($(this).parent().index()) + 1;
                     const col = $(this).index();
-                    if (col === 1 || col === 2) {
+                    if (ev.changedTouches[0].identifier === 0) { //col === 1 || col === 2) {
                         const activatedMember = $(ev.target).closest("td");
                         activatedMember.addClass("highlight");
                         selectedCellPoly.isSelected = true;
@@ -326,12 +369,168 @@ function tabulate(data, columns) {
                             }
                         }
                     }
+                    //}
                 }
-            }
-        )
+            )
+    */
+
     //.text("");
 
     return table;
+}
+
+export function MOUSEMOVE(ev) { // mousemove
+    //console.log("polytable mouseover",ev.buttons,ev);
+    if (ev.buttons === 1) {
+        ev.preventDefault();
+        const row = Number($(this).parent().index()) + 1;
+        const col = $(this).index();
+        if (col === 1 || col === 2) {
+            const activatedMember = $(ev.target).closest("td");
+            activatedMember.addClass("highlight");
+            selectedCellPoly.isSelected = true;
+            //console.log("column", col, row);
+            if (col === 1) selectedCellPoly.selColY[row - 1] = true;
+            else if (col === 2) selectedCellPoly.selColZ[row - 1] = true;
+
+            const cellIndex = col;
+            const rowIndex = row;
+
+            let rowStart, rowEnd, cellStart, cellEnd;
+
+            if (rowIndex < selectedCellPoly.startRowIndex) {
+                rowStart = rowIndex;
+                rowEnd = selectedCellPoly.startRowIndex;
+            } else {
+                rowStart = selectedCellPoly.startRowIndex;
+                rowEnd = rowIndex;
+            }
+
+            if (cellIndex < selectedCellPoly.startCellIndex) {
+                cellStart = cellIndex;
+                cellEnd = selectedCellPoly.startCellIndex;
+            } else {
+                cellStart = selectedCellPoly.startCellIndex;
+                cellEnd = cellIndex;
+            }
+            // console.log("startend", rowStart, rowEnd, col, row, rowStart, rowEnd, cellStart, cellEnd);
+
+            $("#polygonTable td").removeClass("highlight");
+            for (let i = 0; i < app.npkte; i++) {
+                selectedCellPoly.selColY[i] = false;
+                selectedCellPoly.selColZ[i] = false;
+            }
+
+            const tabelle = document.getElementById("polygonTable");
+            for (let i = rowStart; i <= rowEnd; i++) {
+                //const rowCells = table.find("tr").eq(i).find("td");
+                for (let j = cellStart; j <= cellEnd; j++) {
+                    //rowCells.eq(j).addClass("selected");
+                    tabelle.rows.item(i).cells.item(j).classList.add("highlight");
+                    if (j === 1) selectedCellPoly.selColY[i - 1] = true;
+                    if (j === 2) selectedCellPoly.selColZ[i - 1] = true;
+
+                }
+            }
+        }
+    }
+}
+
+export function MOUSEDOWN(ev) {
+    console.log("mousedown", ev.pageX, ev.pageY, ev.which, ev.button);
+    //document.getElementById("polyCanvas").style.display = "block";
+
+    if (ev.which === 3) {               // rechte Maustaste
+        console.log("rechte Maustaste");
+        //ev.preventDefault();
+    } else if (ev.button === 0) {      // linke Maustaste
+        //ev.preventDefault();
+        if (selectedCellPoly.isSelected) {
+            //selectedCellPoly.activatedMember.removeClass("highlight");
+            console.log("is selected", $(this).parent());
+            const el = document.getElementById("input_pkte");
+            if (el) {
+                const npkte = el.value;
+                $("#polygonTable td").removeClass("highlight");
+                for (let i = 0; i < npkte; i++) {
+                    selectedCellPoly.selColY[i] = false;
+                    selectedCellPoly.selColZ[i] = false;
+                }
+            }
+
+        }
+        console.log("cell", $(this), $(this).parent().index());
+        const row = Number($(this).parent().index()) + 1;
+        const col = $(this).index();
+        if (col === 1 || col === 2) {
+            const activatedMember = $(ev.target).closest("td");
+            activatedMember.addClass("highlight");
+            let wert = activatedMember.text();
+
+            //console.log("event", row, col, wert);
+            selectedCellPoly.row = row;
+            selectedCellPoly.col = col;
+            selectedCellPoly.wert = wert;
+            selectedCellPoly.activatedMember = activatedMember;
+            selectedCellPoly.isSelected = true;
+            if (col === 1) selectedCellPoly.selColY[row - 1] = true;
+            else if (col === 2) selectedCellPoly.selColZ[row - 1] = true;
+            selectedCellPoly.startRowIndex = row;
+            selectedCellPoly.startCellIndex = col;
+        }
+    }
+}
+
+
+export function KEYDOWN(ev) {
+    console.log("in FOCUS", ev.keyCode);
+    // trap the return and space keys being pressed
+    if (ev.keyCode === 32) {    // Leertaste
+        ev.preventDefault();
+    } else if (ev.keyCode === 13) {    // return
+        ev.preventDefault();
+
+        const el = document.getElementById("input_pkte");
+        if (el) {
+            const npkte = el.value;
+
+            const tabelle = document.getElementById("polygonTable");
+            //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col]);
+            //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells.item(selectedCellPoly.col));
+            //console.log("tabelle", tabelle.classList);
+            //tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].removeClass("highlight");
+            const row = selectedCellPoly.row;
+            const col = selectedCellPoly.col;
+            let str = 'pt-' + row + '-' + col;
+            const elem = document.getElementById(str);
+            console.log("<RETURN> ID", elem.id, elem.classList);
+            elem.classList.remove('highlight');  // alle selektierte Zellen löschen
+            for (let i = 0; i < npkte; i++) {
+                selectedCellPoly.selColY[i] = false;
+                selectedCellPoly.selColZ[i] = false;
+            }
+            //$("#polygonTable td").removeClass("highlight");
+            if (col == 1) {
+                str = 'pt-' + row + '-2';
+            } else if (col == 2) {
+                if (row < npkte) {
+                    str = 'pt-' + Number(row + 1) + '-1';
+                } else {
+                    str = 'pt-1-1';
+                }
+            }
+
+            const elemNeu = document.getElementById(str);
+            elemNeu.classList.add('highlight');
+            elemNeu.innerText = "";
+            elemNeu.focus();
+            const evt = new Event("mousedown", {"bubbles": true, "cancelable": false});
+            evt.button = 0;     // linke Maustaste
+            elemNeu.dispatchEvent(evt);
+
+        }
+
+    }
 }
 
 // render the tables
@@ -356,6 +555,8 @@ for (let i in table.rows) {
 */
 
 const tabelle = document.getElementById("polygonTable");
+
+
 //console.log("TABLE",tabelle.rows.length);
 /*
 tabelle.rows[1].cells[1].innerText = 0;
@@ -397,6 +598,9 @@ tabelle.rows[7].cells[2].innerText = 10;
 tabelle.rows[8].cells[2].innerText = 10;
 tabelle.rows[9].cells[2].innerText = 20;
 tabelle.rows[10].cells[2].innerText = 30;
+
+tabelle.rows[0].cells[1].innerHTML = 'y&#772; [cm]';
+tabelle.rows[0].cells[2].innerHTML = 'z&#772; [cm]';
 
 
 const objCells = tabelle.rows.item(0).cells;  // Überschrift Punkt zentrieren
@@ -545,6 +749,131 @@ try {
 } catch (error) {
     infoBox.innerHTML += "<br>clipboard-write NICHT implementiert";
 }
+
+//**********************************************************************************************************************
+
+const tpoly = document.getElementById("polygonTable");
+console.log("polygonTable bounding rect", tpoly.getBoundingClientRect().left, tpoly.getBoundingClientRect().top);
+
+let zelle = document.getElementById("pt-1-1");
+console.log("pt-1-1", zelle.getBoundingClientRect().left, zelle.getBoundingClientRect().top, zelle.getBoundingClientRect().width, zelle.getBoundingClientRect().height);
+
+let cellHeight = zelle.getBoundingClientRect().height;
+let cellWidth = zelle.getBoundingClientRect().width;
+let cellLeft = zelle.getBoundingClientRect().left;
+let cellTop = zelle.getBoundingClientRect().top;
+
+//**********************************************************************************************************************
+
+const polyCanvas = d3.select("#polyCanvas")
+    .on("touchmove", function (event) {
+        //console.log("MM polyCanvas", event);  //.clientX, event.clientY, event.pageX, event.pageY);
+        //console.log(event.changedTouches[0].clientX, event.changedTouches[0].clientY,window.scrollX,window.scrollY);
+        //const rect = polyCanvas.selectAll("#rechteck")
+//        const width = event.clientX - cellLeft;
+//        const height = event.clientY - cellTop;
+        let width, height;
+        //if (app.isMac) {
+        width = event.changedTouches[0].pageX - xPolyCanvas - cellLeft; // + window.scrollX;    clientX
+        height = event.changedTouches[0].pageY - yPolyCanvas - cellTop; // + window.scrollY;
+        //} else {
+        //    width = event.changedTouches[0].clientX  - xPolyCanvas - cellLeft; // + window.scrollX;    clientX
+        //    height = event.changedTouches[0].clientY - yPolyCanvas - cellTop; // + window.scrollY;
+        //}
+        rechteck.attr("width", width + 'px');
+        rechteck.attr("height", height + 'px');
+        event.preventDefault();
+        console.log("TM", cellLeft, cellTop, width, height, event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+    })
+    .on("touchstart", function (ev) {
+        console.log("touchstart polyCanvas");
+        //const tabelle = document.getElementById("polyCanvas");
+        //this.style.display = 'block';
+        //ev.target.style.display = 'block';
+        document.getElementById("polyCanvas").style.display = "block";
+        //ev.preventDefault();
+    })
+    .on("touchend", function (ev) {
+        console.log("touchend polyCanvas");
+        document.getElementById("polyCanvas").style.display = "none";
+
+    });
+
+console.log("polyCanvas", polyCanvas.node().getBoundingClientRect());
+
+const inputContainer = document.getElementById("input-container");
+//inputContainer.scrollTop = inputContainer.scrollHeight;
+console.log("scroll", inputContainer.scrollTop, inputContainer.scrollHeight);
+
+polyCanvas.node().style.left = zelle.getBoundingClientRect().left + window.scrollX + "px";
+polyCanvas.node().style.top = zelle.getBoundingClientRect().top + window.scrollY + "px";   // scrollY
+polyCanvas.node().style.height = 10 * cellHeight + "px";
+polyCanvas.node().style.width = 3 * cellWidth + "px";
+
+let xPolyCanvas = zelle.getBoundingClientRect().left + window.scrollX;
+let yPolyCanvas = zelle.getBoundingClientRect().top + window.scrollY;
+
+let rechteck = polyCanvas.append("rect")   // rechteck
+    .attr("x", 0)  // window.scrollX + 'px'
+    .attr("y", 0)  // window.scrollY + 'px'
+    .attr("width", Math.round(cellWidth - 2))
+    .attr("height", Math.round(cellHeight - 2))
+    .attr("stroke", "blue")
+    .attr("stroke-width", 4)
+    .attr("id", "rechteck")
+    .style("z-index", "10")
+    .style("fill", "none");
+
+document.getElementById("polyCanvas").style.display = "none";
+
+console.log("POLYCANVAS", xPolyCanvas, yPolyCanvas);
+//const rect = polyCanvas.selectAll("#rechteck")
+//rechteck.attr("width", '200px');
+
+//console.log("rechteck",rechteck);
+
+/*.attr("x", Math.round(cellLeft))
+    .attr("y", Math.round(cellTop))
+    .attr("width", Math.round(cellWidth))
+    .attr("height", Math.round(cellHeight))
+*/
+//const context = polyCanvas.getContext('2d');
+//console.log("stroke", context.strokeRect(10,10,100,100) );
+
+/*
+var p = document.querySelector('p');
+
+p.addEventListener('click', function init() {
+    p.removeEventListener('click', init, false);
+    p.className = p.className + ' resizable';
+    var resizer = document.createElement('div');
+    resizer.className = 'resizer';
+    p.appendChild(resizer);
+    resizer.addEventListener('mousedown', initDrag, false);
+}, false);
+
+var startX, startY, startWidth, startHeight;
+
+function initDrag(e) {
+    startX = e.clientX;
+    startY = e.clientY;
+    startWidth = parseInt(document.defaultView.getComputedStyle(p).width, 10);
+    startHeight = parseInt(document.defaultView.getComputedStyle(p).height, 10);
+    document.documentElement.addEventListener('mousemove', doDrag, false);
+    document.documentElement.addEventListener('mouseup', stopDrag, false);
+}
+
+function doDrag(e) {
+    p.style.width = (startWidth + e.clientX - startX) + 'px';
+    p.style.height = (startHeight + e.clientY - startY) + 'px';
+}
+
+function stopDrag(e) {
+    document.documentElement.removeEventListener('mousemove', doDrag, false);    document.documentElement.removeEventListener('mouseup', stopDrag, false);
+}
+
+*/
+
 
 /*
 navigator.clipboard

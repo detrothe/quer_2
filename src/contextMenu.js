@@ -101,6 +101,7 @@ let windowHeight;
  * Initialise our application's code.
  */
 export function init_contextmenu() {
+    console.log("init_contextmenu", menu);
     contextListener();
     clickListener();
     keyupListener();

@@ -217,7 +217,7 @@ async function handleFileSelect_save() {
 }
 
 //document.getElementById('readFile').addEventListener('click', initFileSelect_read, false);
-document.getElementById('readFile').addEventListener('click', handleFileSelect_read, false);
+document.getElementById('readFile').addEventListener('click',  handleFileSelect_read, false);
 document.getElementById('saveFile').addEventListener('click', handleFileSelect_save, false);
 //
 // document.getElementById("saveFile").onclick = handleFileSelect_save;

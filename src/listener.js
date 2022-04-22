@@ -1,4 +1,4 @@
-import {app, selectedCellPoly} from './index';
+import {app, selectedCellPoly, MOUSEMOVE, MOUSEDOWN, KEYDOWN} from './index';
 import {CQuer_polygon} from './calc/quer1.js';
 import {CTrans} from './trans.js';
 //import "d3";
@@ -27,9 +27,10 @@ function testNumber(wert, zeile, spalte) {
     if (isNaN(wert)) {
         //window.alert("Das ist keine Zahl ");
 
-        const objCells = document.getElementById("polygonTable").rows.item(zeile).cells;
-        objCells.item(spalte).style.backgroundColor = "darkred";
-        objCells.item(spalte).style.color = "white";
+        //const objCells = document.getElementById("polygonTable").rows.item(zeile).cells;
+        //objCells.item(spalte).style.backgroundColor = "darkred";
+        //objCells.item(spalte).style.color = "white";
+        document.getElementById("polygonTable").rows.item(zeile).cells.item(spalte).classList.add("selected");
 
         return 0;
     }
@@ -82,7 +83,7 @@ export function resize_polyTabelle() {
 
                     // Append a text node to the cell
                     let newText;
-                    if (j == 0) {
+                    if (j === 0) {
                         newText = document.createTextNode(String(i));
                     } else {
                         newText = document.createTextNode("");
@@ -90,16 +91,32 @@ export function resize_polyTabelle() {
                     newCell.appendChild(newText);
                     newCell.style.border = 'solid 1px';
                     newCell.style.padding = '5px';
-                    if (j == 0) {
+                    if (j === 0) {
                         newCell.style.textAlign = "center";
-
                     } else if (j < 3) {
-                        newCell.style.backgroundColor = "#FFFFFF";
-                        newCell.contentEditable = true;
-
+                        //newCell.style.backgroundColor = "#FFFFFF";
+                        newCell.contentEditable = 'true';
+                        newCell.addEventListener("mousemove", MOUSEMOVE);
+                        newCell.addEventListener("mousedown", MOUSEDOWN);
+                        newCell.addEventListener("keydown", KEYDOWN);
+                        newCell.id = "pt-" + i + "-" + j;
+                        //newCell.innerText ="pt-" + i + "-" + j;
+                        newCell.wrap = false;
                     }
                 }
             }
+
+            const inputContainer = document.getElementById("input-container");
+            const polyCanvas = document.getElementById("polyCanvas");
+            const zelle = document.getElementById("pt-1-1");
+            console.log("scroll",inputContainer.scrollTop,inputContainer.scrollHeight,polyCanvas.style.top,polyCanvas.clientTop);
+
+            inputContainer.scrollTop = inputContainer.scrollHeight; // - inputContainer.clientHeight;
+            //const scrollingElement = (document.scrollingElement || document.body);
+            //scrollingElement.scrollTop = scrollingElement.scrollHeight;
+            //polyCanvas.style.top = (polyCanvas.clientTop - (inputContainer.scrollHeight + 950) ) + 'px';
+            polyCanvas.style.top = zelle.getBoundingClientRect().top + window.scrollY + "px";   // scrollY
+
         }
     }
 }
@@ -155,6 +172,7 @@ function rechnen() {
         myScreen.svgWidth = 700;
     }
 
+    $("#polygonTable td").removeClass("selected");
 
     //const polyBox = document.getElementById("polygonTable");
     const svgBox = document.getElementById("my-svg");
@@ -351,8 +369,8 @@ function rechnen() {
                 const y = (tr.yWorld(vec[0])).toFixed(1);
                 const z = (tr.zWorld(vec[1])).toFixed(1);
                 //console.log("mouse move1", y );
-                coordy.innerText = "y:" + y;
-                coordz.innerText = "z:" + z;
+                coordy.innerHTML = "y&#772;:" + y;
+                coordz.innerHTML = "z&#772;:" + z;
                 //console.log("vec", vec, vec[0], vec[1], yp, zp, event.pageX, event.pageY,"|",svgBox.getBoundingClientRect().left);
                 //return tooltip.style("top", zp + "px").style("left", yp + "px");
             });
@@ -365,8 +383,8 @@ function rechnen() {
 
         svg.append('polygon')
             .attr('points', str)
-            .attr('stroke', "green")
-            .attr('fill', "lightgrey")
+            .attr('stroke', "dimgrey")
+            .attr('fill', "lightgrey");
 
         let ys = Math.round(tr.yPix(quer.ys));
         let zs = Math.round(tr.zPix(quer.zs));
@@ -379,22 +397,48 @@ function rechnen() {
             .attr("x2", Math.round(tr.yPix(sl / 2)))
             .attr("y1", Math.round(tr.zPix(0.0)))
             .attr("y2", Math.round(tr.zPix(0.0)))
-            .attr("stroke", "blue")
+            .attr("stroke", "darkslategrey")
             .attr("stroke-width", 2)
-            .attr("marker-end", "url(#arrow_blue)");
+            .attr("marker-end", "url(#arrow_darkslategrey)");
 
-        svg.append("text").attr("x", Number(Math.round(tr.yPix(sl / 2))) + 5).attr("y", Number(Math.round(tr.zPix(0.0))) - 7).text(" y").style("font-size", 15).style("fill", 'blue');
+        svg.append("text").attr("x", Number(Math.round(tr.yPix(sl / 2))) + 5).attr("y", Number(Math.round(tr.zPix(0.0))) - 7).html("y&#772;").style("font-size", 15).style("fill", 'darkslategrey');
 
         svg.append("line")   // Koordinatenkreuz im Ursprung, z-Richtung
             .attr("x1", Math.round(tr.yPix(0.0)))
             .attr("x2", Math.round(tr.yPix(0.0)))
             .attr("y1", Math.round(tr.zPix(0.0)))
             .attr("y2", Math.round(tr.zPix(sl / 2)))
-            .attr("stroke", "blue")
+            .attr("stroke", "darkslategrey")
             .attr("stroke-width", 2)
+            .attr("marker-end", "url(#arrow_darkslategrey)");
+
+        svg.append("text").attr("x", Number(Math.round(tr.yPix(0.0))) + 5).attr("y", Number(Math.round(tr.zPix(sl / 2))) - 6).html("z&#772;").style("font-size", 15).style("fill", 'darkslategrey');
+
+        // y-z Koordinatensystem
+
+        svg.append("line")
+            .attr("x1", ys)
+            .attr("x2", Math.round(tr.yPix(quer.ys+sl/2)))
+            .attr("y1", zs)
+            .attr("y2", zs)
+            .attr("stroke", "blue")
+            .attr("stroke-width", 1.5)
             .attr("marker-end", "url(#arrow_blue)");
 
-        svg.append("text").attr("x", Number(Math.round(tr.yPix(0.0))) + 5).attr("y", Number(Math.round(tr.zPix(sl / 2))) - 6).text(" z").style("font-size", 15).style("fill", 'blue');
+        svg.append("text").attr("x", Number(Math.round(tr.yPix(quer.ys+sl/2))) + 5).attr("y", zs - 5).text("y").style("font-size", 15).style("fill", 'blue');
+
+        svg.append("line")
+            .attr("x1", ys)
+            .attr("x2", ys)
+            .attr("y1", zs)
+            .attr("y2", Math.round(tr.zPix(quer.zs+sl/2)))
+            .attr("stroke", "blue")
+            .attr("stroke-width", 1.5)
+            .attr("marker-end", "url(#arrow_blue)");
+
+        svg.append("text").attr("x", ys + 5).attr("y", Number(Math.round(tr.zPix(quer.zs+sl/2))) - 5).text("z").style("font-size", 15).style("fill", 'blue');
+
+        // Hauptachsenkoordinatensystem
 
         svg.append("line")
             .attr("x1", hauptachse1y)
@@ -419,7 +463,7 @@ function rechnen() {
         svg.append("text").attr("x", Number(hauptachse4y) + 5).attr("y", Number(hauptachse4z) - 5).text(" 2").style("font-size", 15);
 
         svg.append("circle")       // Schwerpunkt
-            .attr("cx", ys).attr("cy", zs).attr("r", 5).style("fill", "steelblue")
+            .attr("cx", ys).attr("cy", zs).attr("r", 5).style("fill", "blue")
             .attr("id", "circleBasicTooltip")
         /*
         .on("mouseover", function (event) {
@@ -447,7 +491,7 @@ function rechnen() {
 
 
         // create a tooltip
-        var tooltip = d3.select("#my-svg")    // #my_dataviz   my-svg
+        const tooltip = d3.select("#my-svg")    // #my_dataviz   my-svg
             .append("div")
             .style("position", "absolute")
             .style("visibility", "hidden")
@@ -478,7 +522,7 @@ function rechnen() {
             })
             .on("mouseout", function () {
                 d3.select(this)
-                    .style("fill", "steelblue");
+                    .style("fill", "blue");
                 return tooltip.style("visibility", "hidden");
             });
 

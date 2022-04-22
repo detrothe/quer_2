@@ -172,6 +172,9 @@ input:valid {
     */
     /*100%; */
     /* height: 50px; */
+    height: 950px;
+    overflow-y: auto;
+
 }
 
 #schnittgroessen {
@@ -276,6 +279,12 @@ input:valid {
 #circleBasicTooltip {
     position: absolute;
 }
+/*
+#polygonTable {
+    height: 500px;
+    overflow-y: auto;
+}
+*/
 
 #polygonTable td {
     background-color: rgb(250, 250, 250);
@@ -328,6 +337,13 @@ button[type=button] {
 button[type=button]:hover {
     background-color: #81ecec;
     border: 2px solid #00cec9;
+}
+
+#polyCanvas {
+    position: absolute;
+    border: 2px solid orangered;
+    z-index: 2;
+    /*display: none;*/
 }
 /*
 .tasten {
