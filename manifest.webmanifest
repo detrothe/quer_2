@@ -1,0 +1,15 @@
+{
+  "background_color": "purple",
+  "description": "polygonal begrenzter Querschnitt",
+  "display": "fullscreen",
+  "icons": [
+    {
+      "src": "icon/polyquer.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "name": "polygonal begrenzter Querschnitt",
+  "short_name": "polyQuer",
+  "start_url": "/?utm_source=homescreen"
+}
