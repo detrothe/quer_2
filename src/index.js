@@ -2,6 +2,8 @@
 //import './spreadsheet/index.js';
 'use strict';
 
+import $ from 'jquery';
+import 'font-awesome/css/font-awesome.min.css';
 import './listener.js';
 import './dateien.js';
 import {init_contextmenu} from './contextMenu.js';

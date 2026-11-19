@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import {app, selectedCellPoly, MOUSEMOVE, MOUSEDOWN, KEYDOWN} from './index';
 import {CQuer_polygon} from './calc/quer1.js';
 import {CTrans} from './trans.js';

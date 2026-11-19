@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import './listener.js';
 import {resize_polyTabelle} from "./listener";
 import {app, myScreen} from "./index";
