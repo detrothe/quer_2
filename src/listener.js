@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import {app, selectedCellPoly, MOUSEMOVE, MOUSEDOWN, KEYDOWN} from './index';
 import {CQuer_polygon} from './calc/quer1.js';
 import {CTrans} from './trans.js';
@@ -173,7 +172,7 @@ function rechnen() {
         myScreen.svgWidth = 700;
     }
 
-    $("#polygonTable td").removeClass("selected");
+    document.querySelectorAll("#polygonTable td").forEach(td => td.classList.remove("selected"));
 
     //const polyBox = document.getElementById("polygonTable");
     const svgBox = document.getElementById("my-svg");

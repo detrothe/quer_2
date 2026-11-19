@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import './listener.js';
 import {resize_polyTabelle} from "./listener";
 import {app, myScreen} from "./index";
@@ -82,12 +81,6 @@ function handleFileSelect_read() {
 
     input.click();
 }
-
-/*
-function initFileSelect_read() {
-    $("#readFile")[0].value = '';   // Damit man gleiche Datei mehrmals einlesen kann
-}
-*/
 
 async function handleFileSelect_save() {
 
