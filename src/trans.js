@@ -23,15 +23,10 @@ class CTrans {
 
         console.log("Grenzen", this.ymin, this.ymax, this.zmin, this.zmax);
 
-        //this.ratio_world = this.dy / this.dz;
-
         console.log("dy,dz", this.dy, this.dz);
 
         this.height = document.getElementById("my-svg").clientHeight - 1;
-        //this.width = document.getElementById("dataviz_area").clientWidth - 1;
         this.width = myScreen.svgWidth - 1;
-
-        //this.ratio = this.width / this.height;
 
         dz = this.dy * this.height / this.width;
         console.log("dz", dz, this.dz);

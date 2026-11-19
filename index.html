@@ -12,14 +12,11 @@
     <link href="./styles/main.css" rel="stylesheet" type="text/css">
     <link href="./styles/contextMenu.css" rel="stylesheet" type="text/css">
 
-    <!-- <link rel="stylesheet" href="http://meyerweb.com/eric/tools/css/reset/reset.css">  -->
-    <!-- <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,300">  -->
     <meta name="theme-color" content="#800080">
     <link rel="icon" type="image/png" href="./polyquer.png">
     <link rel="apple-touch-icon" href="./polyquer.png">
 
     <script type="module" src="./src/index.js"></script>
-    <!-- <script type="module" src="./src/listener.js"></script> -->
 
 </head>
 
@@ -27,23 +24,18 @@
 
 <div class="grid-container">
 
-
     <div class="header">
         <h2>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h2>
 
         <div id="infoBox"></div>
-        <!-- <label for="readFile"> Daten einlesen: &nbsp; </label><input type="button" id="readFile" name="file"/> -->
-        <!--  style="display:none" -->
 
         <button type="button"  id="readFile">Daten einlesen</button>
         <button type="button"  id="saveFile">Daten speichern</button>
-
 
     </div>
 
     <div class="left" style="background-color:#aaa;">
         <div id="input-container">
-
 
             <p>Hinweis: gib zuerst die Anzahl Punkte ein<br> und drücke dann den Button <i>resize Tabelle</i></p>
 
@@ -66,14 +58,6 @@
                 </tbody>
             </table>
 
-
-            <!-- &nbsp;&nbsp;&nbsp;&nbsp;
-            <input type="file" id="files" name="files[]" multiple/>
-            <output id="list"></output>
-            <div id="drop_zone">Drop files here</div>
-            <br>
-            <output id="list_drop"></output>
--->
             <br><br>
 
             <table>
@@ -96,17 +80,6 @@
                 </tr>
                 </tbody>
             </table>
-            <!--
-                        <label for="N_kraft"> N = &nbsp;&nbsp;</label>
-                        <input type="text" id="N_kraft" name="normalkraft" class="input_schnitt" pattern="[0-9.,eE+-]*">
-                        <label> [kN]</label> <br>
-                        <label for="My"> M<sub>y</sub> =&nbsp;</label>
-                        <input type="text" id="My" name="My" class="input_schnitt" pattern="[0-9.,eE+-]*">
-                        <label>[kNm]</label> <br>
-                        <label for="Mz">M<sub>z</sub> =&nbsp;</label>
-                        <input type="text" id="Mz" name="Mz" class="input_schnitt" pattern="[0-9.,eE+-]*">
-                        <label>[kNm]</label>
-            -->
             <br><br><br>
 
         </div>
@@ -172,7 +145,6 @@
     </div>
     <div class="right" style="background-color:#ccc;">
 
-
         <div id="my-svg">
 
             <div id="cursor_coordy">y&#772;:</div>
@@ -209,8 +181,6 @@
 
                 </defs>
 
-                <!-- <circle style="fill: #69b3a2" stroke="black" cx=50 cy=50 r=40></circle>
-                <rect x="100" y="100" width="10" height="10"></rect> -->
             </svg>
         </div>
 
@@ -237,36 +207,6 @@
         </li>
     </ul>
 </nav>
-
-
-<!--
-<div id="tastatur">
-    // Include a header DIV with the same name as the draggable DIV, followed by "header"
-    <div id="tastatur_header">Click here to move</div>
-    <div id="taste1" class="tasten">1</div>
-    <div id="taste2" class="tasten">2</div>
-    <div id="taste3" class="tasten">3</div>
-    <div id="taste4" class="tasten">4</div>
-    <div id="taste5" class="tasten">5</div>
-    <div id="taste6" class="tasten">6</div>
-    <div id="taste7" class="tasten">7</div>
-    <div id="taste8" class="tasten">8</div>
-    <div id="taste9" class="tasten">9</div>
-    <div id="taste0" class="tasten">0</div>
-    <div id="taste_komma" class="tasten">,</div>
-    <div id="taste_del" class="tasten">del</div>
-    <div id="taste_Minus" class="tasten">-</div>
-    <div id="taste_Exp" class="tasten">e</div>
-    <div id="taste_Tab" class="tasten">tab</div>
-</div>
--->
-
-
-<!--
-<div id="x-spreadsheet-demo"></div>
-
-<canvas id="my-canvas"></canvas>
--->
 
 </body>
 

@@ -1,5 +1,3 @@
-//import {spreadsheet} from './spreadsheet/index.js';
-//import './spreadsheet/index.js';
 'use strict';
 
 import 'font-awesome/css/font-awesome.min.css';
@@ -9,9 +7,6 @@ import {init_contextmenu} from './contextMenu.js';
 import * as d3 from "d3";
 import DetectOS from 'detectos.js'
 import {CQuer_polygon} from "./calc/quer1";
-
-
-//export var xs; // the spreadsheet
 
 export const selectedCellPoly = {
     isSelected: false,
@@ -39,7 +34,6 @@ export const myScreen = {
 
 myScreen.clientWidth = document.documentElement.clientWidth;
 myScreen.clientHeight = document.documentElement.clientHeight;
-
 
 if (myScreen.clientWidth > 1500) {
     myScreen.svgWidth = myScreen.clientWidth - 900;
@@ -69,7 +63,6 @@ export const app = {
     npkte: 0,
 };
 
-
 export const Detect = new DetectOS();
 
 export const infoBox = document.getElementById("infoBox");
@@ -82,29 +75,18 @@ if (app.hasFSAccess) {
     infoBox.innerHTML += "<br>showSaveFilePicker wird NICHT unterstützt";
 }
 
-
 console.log("height=", myScreen.clientHeight);
 console.log("width =", myScreen.clientWidth);
-
 
 init_contextmenu();
 
 /**
  * Listens for click events.
  */
-/*
-document.addEventListener("contextmenu", function (e) {
-    console.log("right click", e);
-
-    e.preventDefault();
-});
-*/
 
 const elem = document.getElementById("input_pkte");
-//elem.setAttribute( 'value','8');
 elem.value = 10;
 app.npkte = 10;
-
 
 /*
 // Matrix mit 4 Zeilen und 2 Spalten  nicht löschen
@@ -117,7 +99,6 @@ arr[3][0] ='41';arr[3][1] ='42';
 
 console.info(arr);
 */
-
 
 const polygon = {};
 const punkte = []
@@ -173,7 +154,6 @@ function tabulate(data, columns) {
     const cells = rows.selectAll('td')
         .data(function (row) {
             return columns.map(function (column) {
-                //console.log("function (column)",row,column,row[column]);
                 return {column: column, value: row[column]};
             });
         })
@@ -195,12 +175,7 @@ function tabulate(data, columns) {
             selectedCellPoly.starty = parseInt(touchobj.clientY);
             console.log("touchstart bei ClientX: " + selectedCellPoly.startx + "px ClientY: " + selectedCellPoly.starty + "px");
 
-
-            //ev.preventDefault();
-
-            //ev.preventDefault();
             if (selectedCellPoly.isSelected) {
-                //selectedCellPoly.activatedMember.removeClass("highlight");
                 console.log("is selected", this.parentElement);
                 const el = document.getElementById("input_pkte");
                 if (el) {
@@ -220,7 +195,6 @@ function tabulate(data, columns) {
                 activatedMember.classList.add("highlight");
                 let wert = activatedMember.textContent;
 
-                //console.log("event", row, col, wert);
                 selectedCellPoly.row = row;
                 selectedCellPoly.col = col;
                 selectedCellPoly.wert = wert;
@@ -235,34 +209,14 @@ function tabulate(data, columns) {
                 selectedCellPoly.zelle = document.getElementById(str);
 
                 console.log("str", str, cellLeft, cellTop);
-                /*
-                                const elemNeu = document.getElementById(str);
-                                elemNeu.focus();
-                                const evt = new Event("mousedown", {"bubbles": true, "cancelable": false});
-                                evt.button = 0;     // linke Maustaste
-                                elemNeu.dispatchEvent(evt);
-                */
-                /*  Box zeichnen
-                cellLeft = (col - 1) * cellWidth;
-                cellTop = (row - 1) * cellHeight;
-                document.getElementById("polyCanvas").style.display = "block";
-                rechteck.attr("x", cellLeft + 'px');
-                rechteck.attr("y", cellTop + 'px');
-                rechteck.attr("width", cellWidth + 'px');
-                rechteck.attr("height", cellHeight + 'px');
-                */
             }
 
-
         })
-
-    //.text("");
 
     return table;
 }
 
 export function MOUSEMOVE(ev) { // mousemove
-    //console.log("polytable mouseover",ev.buttons,ev);
     if (ev.buttons === 1) {
         ev.preventDefault();
         const row = this.parentElement.sectionRowIndex + 1;
@@ -271,7 +225,6 @@ export function MOUSEMOVE(ev) { // mousemove
             const activatedMember = ev.target.closest("td");
             activatedMember.classList.add("highlight");
             selectedCellPoly.isSelected = true;
-            //console.log("column", col, row);
             if (col === 1) selectedCellPoly.selColY[row - 1] = true;
             else if (col === 2) selectedCellPoly.selColZ[row - 1] = true;
 
@@ -295,7 +248,6 @@ export function MOUSEMOVE(ev) { // mousemove
                 cellStart = selectedCellPoly.startCellIndex;
                 cellEnd = cellIndex;
             }
-            // console.log("startend", rowStart, rowEnd, col, row, rowStart, rowEnd, cellStart, cellEnd);
 
             document.querySelectorAll("#polygonTable td").forEach(td => td.classList.remove("highlight"));
             for (let i = 0; i < app.npkte; i++) {
@@ -305,9 +257,7 @@ export function MOUSEMOVE(ev) { // mousemove
 
             const tabelle = document.getElementById("polygonTable");
             for (let i = rowStart; i <= rowEnd; i++) {
-                //const rowCells = table.find("tr").eq(i).find("td");
                 for (let j = cellStart; j <= cellEnd; j++) {
-                    //rowCells.eq(j).addClass("selected");
                     tabelle.rows.item(i).cells.item(j).classList.add("highlight");
                     if (j === 1) selectedCellPoly.selColY[i - 1] = true;
                     if (j === 2) selectedCellPoly.selColZ[i - 1] = true;
@@ -320,15 +270,11 @@ export function MOUSEMOVE(ev) { // mousemove
 
 export function MOUSEDOWN(ev) {
     console.log("mousedown", ev.pageX, ev.pageY, ev.which, ev.button);
-    //document.getElementById("polyCanvas").style.display = "block";
 
     if (ev.which === 3) {               // rechte Maustaste
         console.log("rechte Maustaste");
-        //ev.preventDefault();
     } else if (ev.button === 0) {      // linke Maustaste
-        //ev.preventDefault();
         if (selectedCellPoly.isSelected) {
-            //selectedCellPoly.activatedMember.removeClass("highlight");
             console.log("is selected", this.parentElement);
             const el = document.getElementById("input_pkte");
             if (el) {
@@ -349,7 +295,6 @@ export function MOUSEDOWN(ev) {
             activatedMember.classList.add("highlight");
             let wert = activatedMember.textContent;
 
-            //console.log("event", row, col, wert);
             selectedCellPoly.row = row;
             selectedCellPoly.col = col;
             selectedCellPoly.wert = wert;
@@ -362,7 +307,6 @@ export function MOUSEDOWN(ev) {
         }
     }
 }
-
 
 export function KEYDOWN(ev) {
     console.log("in FOCUS", ev.keyCode);
@@ -377,10 +321,6 @@ export function KEYDOWN(ev) {
             const npkte = el.value;
 
             const tabelle = document.getElementById("polygonTable");
-            //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col]);
-            //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells.item(selectedCellPoly.col));
-            //console.log("tabelle", tabelle.classList);
-            //tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].removeClass("highlight");
             const row = selectedCellPoly.row;
             const col = selectedCellPoly.col;
             let str = 'pt-' + row + '-' + col;
@@ -417,47 +357,8 @@ export function KEYDOWN(ev) {
 // render the tables
 tabulate(polygon.punkte, ['Punkt', 'y [cm]', 'z [cm]', 'sigma [kN/cm²]']); // 4 column table
 
-//tabulate(data, ['date']); // table with only date column
-//tabulate(data, ['close']); // table with only close column
-/*
-let table = document.getElementById("polygonTable");
-for (let i in table.rows) {
-    let row = table.rows[i]
-    console.log('i=',i,'| ',row);
-    //iterate through rows
-    //rows would be accessed using the "row" variable assigned in the for loop
-    for (let j in row.cells) {
-        let col = row.cells[j]
-        console.log('i=',i,' j=',j,' inner| ',col.innerHTML);
-        //iterate through columns
-        //columns would be accessed using the "col" variable assigned in the for loop
-    }
-}
-*/
-
 const tabelle = document.getElementById("polygonTable");
 
-
-//console.log("TABLE",tabelle.rows.length);
-/*
-tabelle.rows[1].cells[1].innerText = 0;
-tabelle.rows[2].cells[1].innerText = 10;
-tabelle.rows[3].cells[1].innerText = 10;
-tabelle.rows[4].cells[1].innerText = 6;
-tabelle.rows[5].cells[1].innerText = 6;
-tabelle.rows[6].cells[1].innerText = 4;
-tabelle.rows[7].cells[1].innerText = 4;
-tabelle.rows[8].cells[1].innerText = 0;
-
-tabelle.rows[1].cells[2].innerText = 0;
-tabelle.rows[2].cells[2].innerText = 0;
-tabelle.rows[3].cells[2].innerText = 2;
-tabelle.rows[4].cells[2].innerText = 2;
-tabelle.rows[5].cells[2].innerText = 7;
-tabelle.rows[6].cells[2].innerText = 7;
-tabelle.rows[7].cells[2].innerText = 2;
-tabelle.rows[8].cells[2].innerText = 2;
-*/
 tabelle.rows[1].cells[1].innerText = 0;
 tabelle.rows[2].cells[1].innerText = 30;
 tabelle.rows[3].cells[1].innerText = 30;
@@ -483,7 +384,6 @@ tabelle.rows[10].cells[2].innerText = 30;
 tabelle.rows[0].cells[1].innerHTML = 'y&#772; [cm]';
 tabelle.rows[0].cells[2].innerHTML = 'z&#772; [cm]';
 
-
 const objCells = tabelle.rows.item(0).cells;  // Überschrift Punkt zentrieren
 objCells.item(0).style.textAlign = "center";
 
@@ -491,14 +391,11 @@ for (let i = 1; i < tabelle.rows.length; i++) {
     const objCells = tabelle.rows.item(i).cells;
     objCells.item(0).contentEditable = false;
     objCells.item(0).style.textAlign = "center";
-    //objCells.item(1).style.backgroundColor = "#FFFFFF";
-    //objCells.item(2).style.backgroundColor = "#FFFFFF";
     objCells.item(1).id = "pt-" + i + "-" + 1;
     objCells.item(2).id = "pt-" + i + "-" + 2;
     objCells.item(3).contentEditable = false;
     objCells.item(1).wrap = false;
 
-    //console.log(objCells.item(0));
 }
 
 const table = document.getElementById("schnittgroessen_table");
@@ -575,23 +472,6 @@ table.querySelectorAll("td").forEach(td => {
 document.addEventListener("mouseup", function () {
     isMouseDown = false;
 });
-/*
-console.log("navigator", navigator.clipboard);
-
-// Check for the various File API support.
-if (window.File && window.FileReader && window.FileList && window.Blob) {
-
-    console.log("Great success! All the File APIs are supported.");
-} else {
-    alert('The File APIs are not fully supported in this browser.');
-}
-
-
-const coordy = document.getElementById("cursor_coordy");
-const coordz = document.getElementById("cursor_coordz");
-
-console.log("coordyz",coordy.getBoundingClientRect().top,coordz.getBoundingClientRect().top,coordy.offsetHeight,coordz.offsetHeight,coordy.clientHeight,coordz.clientHeight,coordy.clientTop,coordz.clientTop);
-*/
 try {
     navigator.permissions.query({name: "clipboard-write"}).then(result => {
         if ('state' in result) {
@@ -624,19 +504,9 @@ let cellTop = zelle.getBoundingClientRect().top;
 
 const polyCanvas = d3.select("#polyCanvas")
     .on("touchmove", function (event) {
-        //console.log("MM polyCanvas", event);  //.clientX, event.clientY, event.pageX, event.pageY);
-        //console.log(event.changedTouches[0].clientX, event.changedTouches[0].clientY,window.scrollX,window.scrollY);
-        //const rect = polyCanvas.selectAll("#rechteck")
-//        const width = event.clientX - cellLeft;
-//        const height = event.clientY - cellTop;
         let width, height;
-        //if (app.isMac) {
         width = event.changedTouches[0].pageX - xPolyCanvas - cellLeft; // + window.scrollX;    clientX
         height = event.changedTouches[0].pageY - yPolyCanvas - cellTop; // + window.scrollY;
-        //} else {
-        //    width = event.changedTouches[0].clientX  - xPolyCanvas - cellLeft; // + window.scrollX;    clientX
-        //    height = event.changedTouches[0].clientY - yPolyCanvas - cellTop; // + window.scrollY;
-        //}
         rechteck.attr("width", width + 'px');
         rechteck.attr("height", height + 'px');
         event.preventDefault();
@@ -644,11 +514,7 @@ const polyCanvas = d3.select("#polyCanvas")
     })
     .on("touchstart", function (ev) {
         console.log("touchstart polyCanvas");
-        //const tabelle = document.getElementById("polyCanvas");
-        //this.style.display = 'block';
-        //ev.target.style.display = 'block';
         document.getElementById("polyCanvas").style.display = "block";
-        //ev.preventDefault();
     })
     .on("touchend", function (ev) {
         console.log("touchend polyCanvas");
@@ -659,7 +525,6 @@ const polyCanvas = d3.select("#polyCanvas")
 console.log("polyCanvas", polyCanvas.node().getBoundingClientRect());
 
 const inputContainer = document.getElementById("input-container");
-//inputContainer.scrollTop = inputContainer.scrollHeight;
 console.log("scroll", inputContainer.scrollTop, inputContainer.scrollHeight);
 
 polyCanvas.node().style.left = zelle.getBoundingClientRect().left + window.scrollX + "px";
@@ -684,363 +549,3 @@ let rechteck = polyCanvas.append("rect")   // rechteck
 document.getElementById("polyCanvas").style.display = "none";
 
 console.log("POLYCANVAS", xPolyCanvas, yPolyCanvas);
-//const rect = polyCanvas.selectAll("#rechteck")
-//rechteck.attr("width", '200px');
-
-//console.log("rechteck",rechteck);
-
-/*.attr("x", Math.round(cellLeft))
-    .attr("y", Math.round(cellTop))
-    .attr("width", Math.round(cellWidth))
-    .attr("height", Math.round(cellHeight))
-*/
-//const context = polyCanvas.getContext('2d');
-//console.log("stroke", context.strokeRect(10,10,100,100) );
-
-/*
-var p = document.querySelector('p');
-
-p.addEventListener('click', function init() {
-    p.removeEventListener('click', init, false);
-    p.className = p.className + ' resizable';
-    var resizer = document.createElement('div');
-    resizer.className = 'resizer';
-    p.appendChild(resizer);
-    resizer.addEventListener('mousedown', initDrag, false);
-}, false);
-
-var startX, startY, startWidth, startHeight;
-
-function initDrag(e) {
-    startX = e.clientX;
-    startY = e.clientY;
-    startWidth = parseInt(document.defaultView.getComputedStyle(p).width, 10);
-    startHeight = parseInt(document.defaultView.getComputedStyle(p).height, 10);
-    document.documentElement.addEventListener('mousemove', doDrag, false);
-    document.documentElement.addEventListener('mouseup', stopDrag, false);
-}
-
-function doDrag(e) {
-    p.style.width = (startWidth + e.clientX - startX) + 'px';
-    p.style.height = (startHeight + e.clientY - startY) + 'px';
-}
-
-function stopDrag(e) {
-    document.documentElement.removeEventListener('mousemove', doDrag, false);    document.documentElement.removeEventListener('mouseup', stopDrag, false);
-}
-
-*/
-
-
-/*
-navigator.clipboard
-    .writeText("hallo Welt")
-    .then(() => {
-        console.log("clipboard successfully set ");
-    })
-    .catch(() => {
-        console.log("clipboard write failed");
-    });
-*/
-//coordz.setAttribute("top", coordy.getBoundingClientRect().top);
-//coordz.style.top =  "15px";
-
-/*
-function handleFileSelect(evt) {
-    var files = evt.target.files; // FileList object
-
-    // files is a FileList of File objects. List some properties.
-    var output = [];
-    for (var i = 0, f; f = files[i]; i++) {
-        output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-            f.size, ' bytes, last modified: ',
-            f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-            '</li>');
-    }
-    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-}
-*/
-
-
-//document.getElementById('files').addEventListener('change', handleFileSelect, false);
-
-
-/*
-const btn_T1 = document.getElementById("taste1");
-btn_T1.addEventListener('click', taste_1);
-const btn_T2 = document.getElementById("taste2");
-btn_T2.addEventListener('click', taste_2);
-const btn_T3 = document.getElementById("taste3");
-btn_T3.addEventListener('click', taste_3);
-const btn_T4 = document.getElementById("taste4");
-btn_T4.addEventListener('click', taste_4);
-const btn_T5 = document.getElementById("taste5");
-btn_T5.addEventListener('click', taste_5);
-const btn_T6 = document.getElementById("taste6");
-btn_T6.addEventListener('click', taste_6);
-const btn_T7 = document.getElementById("taste7");
-btn_T7.addEventListener('click', taste_7);
-const btn_T8 = document.getElementById("taste8");
-btn_T8.addEventListener('click', taste_8);
-const btn_T9 = document.getElementById("taste9");
-btn_T9.addEventListener('click', taste_9);
-const btn_T0 = document.getElementById("taste0");
-btn_T0.addEventListener('click', taste_0);
-const btn_TKomma = document.getElementById("taste_komma");
-btn_TKomma.addEventListener('click', taste_Komma);
-const btn_TDel = document.getElementById("taste_del");
-btn_TDel.addEventListener('click', taste_Del);
-const btn_TExp = document.getElementById("taste_Exp");
-btn_TExp.addEventListener('click', taste_Exp);
-const btn_TMinus = document.getElementById("taste_Minus");
-btn_TMinus.addEventListener('click', taste_Minus);
-const btn_TTab = document.getElementById("taste_Tab");
-btn_TTab.addEventListener('click', taste_Tab);
-
-function taste_1 () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste 1 gedrückt",selectedCellPoly.wert + 1);
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + 1;
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-function taste_2 () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste 2 gedrückt",selectedCellPoly.wert + 2);
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + 2;
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-function taste_3 () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste 3 gedrückt",selectedCellPoly.wert + 3);
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + 3;
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-
-function taste_4 () {
-
-if ( selectedCellPoly.isSelected ) {
-    console.log("Taste 4 gedrückt",selectedCellPoly.wert + 4);
-    const tabelle = document.getElementById("polygonTable");
-    selectedCellPoly.wert = selectedCellPoly.wert + 4;
-    tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-}
-}
-function taste_5 () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste 5 gedrückt",selectedCellPoly.wert + 5);
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + 5;
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-function taste_6 () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste 6 gedrückt",selectedCellPoly.wert + 6);
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + 6;
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-function taste_7 () {
-
-if ( selectedCellPoly.isSelected ) {
-    console.log("Taste 7 gedrückt",selectedCellPoly.wert + 7);
-    const tabelle = document.getElementById("polygonTable");
-    selectedCellPoly.wert = selectedCellPoly.wert + 7;
-    tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-}
-}
-function taste_8 () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste 8 gedrückt",selectedCellPoly.wert + 8);
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + 8;
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-function taste_9 () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste 9 gedrückt",selectedCellPoly.wert + 9);
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + 9;
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-
-function taste_0 () {
-
-if ( selectedCellPoly.isSelected ) {
-    console.log("Taste 0 gedrückt",selectedCellPoly.wert + 0);
-    const tabelle = document.getElementById("polygonTable");
-    selectedCellPoly.wert = selectedCellPoly.wert + 0;
-    tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-}
-}
-function taste_Komma () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste Komma gedrückt",selectedCellPoly.wert + ",");
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + ",";
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-function taste_Del () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste Del gedrückt",selectedCellPoly.wert);
-        const tabelle = document.getElementById("polygonTable");
-        let str = selectedCellPoly.wert;
-        selectedCellPoly.wert = str.substring(0,str.length-1);
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-function taste_Exp () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste Exp gedrückt",selectedCellPoly.wert + 'E');
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + "e";
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-function taste_Tab () {
-
-    if ( selectedCellPoly.isSelected ) {
-        const tabelle = document.getElementById("polygonTable");
-        //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col]);
-        //console.log("Taste Tab gedrückt",tabelle.rows[selectedCellPoly.row].cells.item(selectedCellPoly.col));
-        console.log("tabelle",tabelle.classList);
-        //tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].removeClass("highlight");
-        const row = selectedCellPoly.row;
-        const col = selectedCellPoly.col;
-        let str = 'pt-' + row + '-' + col;
-        const elem = document.getElementById(str);
-        console.log("ID",elem.id, elem.classList);
-        elem.classList.remove('highlight');
-        if ( col == 1) {
-            str = 'pt-' + row + '-2';
-        }
-        else if ( col == 2 ) {
-            if ( row < npkte ) {
-                str = 'pt-' + Number(row+1) + '-1';
-            } else {
-                str = 'pt-1-1';
-            }
-        }
-
-        const elemNeu = document.getElementById(str);
-        elemNeu.classList.add('highlight');
-        elemNeu.innerText ="";
-        elemNeu.focus();
-        const evt = new Event("mousedown", {"bubbles":true, "cancelable":false});
-        elemNeu.dispatchEvent(evt);
-    }
-}
-function taste_Minus () {
-
-    if ( selectedCellPoly.isSelected ) {
-        console.log("Taste Del gedrückt",selectedCellPoly.wert + "-");
-        const tabelle = document.getElementById("polygonTable");
-        selectedCellPoly.wert = selectedCellPoly.wert + '-';
-        tabelle.rows[selectedCellPoly.row].cells[selectedCellPoly.col].innerText = selectedCellPoly.wert;
-    }
-}
-
- */
-/*
-const polyBox = document.getElementById("polygonTable");
-
-//console.log("polyBox.clientHeight", polyBox.clientHeight);
-//console.log("polyBox.style.top", polyBox.getBoundingClientRect().top + window.pageYOffset);
-//console.log("top" + document.getElementById("my-svg").style.top);
-
-const tastaturBox = document.getElementById("tastatur");
-const newTop = polyBox.getBoundingClientRect().top + window.scrollY;
-const newLeft = polyBox.getBoundingClientRect().left + polyBox.getBoundingClientRect().width + window.scrollX + 5;
-tastaturBox.style.top = newTop + "px";
-tastaturBox.style.left = newLeft + "px";
-
-
-// Make the DIV element draggable:
-dragElement(document.getElementById("tastatur"));
-
-function dragElement(elmnt) {
-    let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-    if (document.getElementById(elmnt.id + "_header")) {
-        // if present, the header is where you move the DIV from:
-        document.getElementById(elmnt.id + "_header").onmousedown = dragMouseDown;
-    } else {
-        // otherwise, move the DIV from anywhere inside the DIV:
-        elmnt.onmousedown = dragMouseDown;
-    }
-
-    function dragMouseDown(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // get the mouse cursor position at startup:
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        document.onmouseup = closeDragElement;
-        // call a function whenever the cursor moves:
-        document.onmousemove = elementDrag;
-    }
-
-    function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
-        // calculate the new cursor position:
-        pos1 = pos3 - e.clientX;
-        pos2 = pos4 - e.clientY;
-        pos3 = e.clientX;
-        pos4 = e.clientY;
-        // set the element's new position:
-        elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-        elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-    }
-
-    function closeDragElement() {
-        // stop moving when mouse button is released:
-        document.onmouseup = null;
-        document.onmousemove = null;
-    }
-}
-
-const box = document.getElementById('polygonTable');
-*/
-/* listen to the touchMove event,
-every time it fires, grab the location
-of touch and assign it to box */
-/*
-box.addEventListener('touchmove', function(e) {
-    // grab the location of touch
-    var touchLocation = e.targetTouches[0];
-
-    // assign box new coordinates based on the touch.
-    box.style.left = touchLocation.pageX + 'px';
-    box.style.top = touchLocation.pageY + 'px';
-})
-*/
-/* record the position of the touch
-when released using touchend event.
-This will be the drop position. */
-/*
-box.addEventListener('touchend', function(e) {
-    // current box position.
-    var x = parseInt(box.style.left);
-    var y = parseInt(box.style.top);
-})
-*/

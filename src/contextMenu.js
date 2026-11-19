@@ -1,7 +1,5 @@
 import {app, Detect, infoBox, selectedCellPoly} from './index';
 
-//(function () {
-
 "use strict";
 
 //////////////////////////////////////////////////////////////////////////////
@@ -46,8 +44,6 @@ function getPosition(e) {
     let posx = 0;
     let posy = 0;
 
-    //if (!e) var e = window.event;
-
     if (e.pageX || e.pageY) {
         posx = e.pageX;
         posy = e.pageY;
@@ -73,8 +69,6 @@ function getPosition(e) {
 /**
  * Variables.
  */
-    //var contextMenuClassName = "context-menu";
-    //var contextMenuItemClassName = "context-menu__item";
 const contextMenuLinkClassName = "context-menu__link";
 const contextMenuActive = "context-menu--active";
 
@@ -86,13 +80,9 @@ let clickCoordsX;
 let clickCoordsY;
 
 const menu = document.querySelector("#context-menu");
-//var menuItems = menu.querySelectorAll(".context-menu__item");
 let menuState = 0;
 let menuWidth;
 let menuHeight;
-//var menuPosition;
-//var menuPositionX;
-//var menuPositionY;
 
 let windowWidth;
 let windowHeight;
@@ -139,8 +129,6 @@ function clickListener() {
             e.preventDefault();
             menuItemListener(clickeElIsLink);
         } else {
-            //console.log("clickListener", e.button, e.which);
-            //let button = e.which || e.button;  // e.which ||
             if (e.button === 0) {   // linke Maustaste
                 toggleMenuOff();
             }
@@ -152,10 +140,8 @@ function clickListener() {
  * Listens for keyup events.
  */
 function keyupListener() {
-    //console.log("keyupListener",keyupListener);
 
     window.onkeyup = function (e) {
-        //console.log("keyupListener",e.code, e.key,e);   // geht auch
         if (e.keyCode === 27) {   // ESC Taste
             toggleMenuOff();
         }
@@ -207,36 +193,17 @@ function positionMenu(e) {
 
     windowWidth = document.documentElement.clientWidth;   //window.innerWidth;
     windowHeight = document.documentElement.clientHeight; //window.innerHeight;
-    /*
-        if ( (windowWidth - clickCoordsX) < menuWidth ) {
-          menu.style.left = windowWidth - menuWidth + "px";
-        } else {
-          //menu.style.left = clickCoordsX + "px";
-          menu.style.left = e.pageX + "px";
-        }
-    */
     if ((e.pageX + menuWidth) > windowWidth) {
         menu.style.left = e.pageX - menuWidth + "px";
     } else {
-        //menu.style.left = clickCoordsX + "px";
         menu.style.left = e.pageX + "px";
     }
-    /*
-        if ( (windowHeight - clickCoordsY) < menuHeight ) {
-          menu.style.top = windowHeight - menuHeight + "px";
-        } else {
-          //menu.style.top = clickCoordsY + "px";
-          menu.style.top = e.pageY + "px";
-        }
-     */
-    //console.log("positionmenu", e.pageY, menuHeight, windowHeight);
     let str = `${e.pageY}, ${menuHeight}, ${windowHeight}`;
     infoBox.innerHTML += "<br>positionmenu, " + str;
 
     if ((e.pageY + menuHeight) > windowHeight) {
         menu.style.top = e.pageY - menuHeight + "px";
     } else {
-        //menu.style.top = clickCoordsY + "px";
         menu.style.top = e.pageY + "px";
     }
 }
@@ -277,7 +244,6 @@ function menuItemListener(link) {
 
         let wert = Number(selectedCellPoly.wert);
         console.log("increment_1, wert=", wert);
-
 
         const tabelle = document.getElementById("polygonTable");
 
@@ -341,17 +307,13 @@ function menuItemListener(link) {
         const tabelle = document.getElementById("polygonTable");
 
         navigator.clipboard.readText().then(function (clipText) {
-            //console.log("clipText", clipText);
 
             let zeilen = clipText.split(newLine);
-            //console.log("zeilen", zeilen, zeilen.length);
 
             let i, j;
             for (i = 0; i < zeilen.length - 1; i++) {
                 let zeile = zeilen[i].split("\t");
-                //console.log("zeile", i, zeile, zeile.length);
                 for (j = 0; j < zeile.length; j++) {
-                    //console.log("z", i, j, zeile[j]);
                     if ((row + i) <= app.npkte) {
                         tabelle.rows[row + i].cells[col + j].innerText = zeile[j];
                     }
@@ -365,6 +327,3 @@ function menuItemListener(link) {
 /**
  * Run the app.
  */
-// init();
-
-//})();

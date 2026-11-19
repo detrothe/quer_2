@@ -1,7 +1,6 @@
 
 class CQuer_polygon {
 
-
     constructor( width=0, height=0) {
 
         console.log('im Konstruktor Rechteck von CQuer_polygon');
@@ -83,7 +82,6 @@ class CQuer_polygon {
 
         this.Imax = temp + Math.sqrt(tempm * tempm + this.Iyz_s * this.Iyz_s);
         this.Imin = temp - Math.sqrt(tempm * tempm + this.Iyz_s * this.Iyz_s);
-
 
         if ( Math.abs(this.Iy_s - this.Iz_s) < 0.000000000001 && Math.abs(this.Iyz_s) < 0.000000000001 )
         {
