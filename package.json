@@ -4,17 +4,19 @@
   "description": "Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts",
   "scripts": {
     "dev": "vite --open",
-    "build": "vite build",
-    "preview": "vite preview --open"
+    "build": "tsc && vite build",
+    "preview": "npm run build && vite preview --open",
+    "typecheck": "tsc"
   },
   "author": "det",
   "license": "ISC",
   "dependencies": {
-    "d3": "^7.9.2",
     "detectos.js": "^2.0.1",
-    "font-awesome": "^4.7.0"
+    "font-awesome": "^4.7.0",
+    "two.js": "^0.8.24"
   },
   "devDependencies": {
+    "typescript": "^7.0.2",
     "vite": "^8.3.8",
     "vite-plugin-pwa": "^2.0.0"
   },
