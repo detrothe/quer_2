@@ -13,9 +13,12 @@
   "dependencies": {
     "detectos.js": "^2.0.1",
     "font-awesome": "^4.7.0",
+    "lil-gui": "^0.21.0",
+    "three": "^0.187.0",
     "two.js": "^0.8.24"
   },
   "devDependencies": {
+    "@types/three": "^0.187.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
     "vite-plugin-pwa": "^2.0.0"

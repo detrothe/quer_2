@@ -31,6 +31,7 @@
 
         <button type="button"  id="readFile">Daten einlesen</button>
         <button type="button"  id="saveFile">Daten speichern</button>
+        <button type="button"  id="open3d">3D-Ansicht</button>
 
     </div>
 
@@ -155,6 +156,17 @@
             </svg>
         </div>
 
+    </div>
+
+    <div id="view3d">
+        <div id="view3d-canvas"></div>
+        <div id="view3d-gui"></div>
+        <div id="view3d-info">
+            <div>Spannungen in kN/cm²</div>
+            <div id="v3d-minmax"></div>
+        </div>
+        <div id="view3d-hinweis">3D-Ansicht: bitte zuerst <i>Rechnen</i> drücken</div>
+        <button type="button" id="close3d" title="3D-Ansicht schließen">&#10005;</button>
     </div>
 
     <div class="footer">

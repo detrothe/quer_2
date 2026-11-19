@@ -248,3 +248,165 @@ button[type=button]:hover {
     border: 2px solid orangered;
     z-index: 2;
 }
+
+/*-----------------------------------------------------------------------------------------*/
+/* 3D-Ansicht: auf breiten Bildschirmen neben der 2D-Grafik, sonst als Vollbild-Overlay */
+
+#view3d {
+    position: relative;
+    display: none;
+    height: 1000px;
+    background-color: #dddddd;
+    overflow: hidden;
+}
+
+#view3d-canvas {
+    position: absolute;
+    inset: 0;
+}
+
+#view3d-canvas canvas {
+    display: block;
+    touch-action: none;
+}
+
+.view3d-labels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+#view3d-gui {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+}
+
+/* lil-gui im Stil der Dünnwand-App: größere Schrift, gelbe Titelleiste */
+#view3d-gui .lil-gui {
+    --width: 260px;
+    --font-size: 15px;
+    --input-font-size: 15px;
+    --widget-height: 26px;
+    --title-height: 32px;
+    --checkbox-size: 18px;
+    --name-width: 55%;
+    --title-background-color: #b5b000;
+    --title-text-color: #ffffff;
+}
+
+#view3d-info {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 2;
+    padding: 8px 10px;
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 4px;
+    line-height: 1.6;
+}
+
+/* Fangkreuz und Wertanzeige neben dem Cursor */
+#view3d-canvas canvas {
+    cursor: none;
+}
+
+.view3d-cursor {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.view3d-cursor line {
+    stroke: #000000;
+    stroke-width: 1.5;
+}
+
+.view3d-cursor.gefangen line {
+    stroke: #e08000;
+    stroke-width: 2.5;
+}
+
+.view3d-wert {
+    position: absolute;
+    z-index: 1;
+    padding: 3px 6px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border: 1px solid #888888;
+    border-radius: 3px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+#view3d-hinweis {
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    text-align: center;
+}
+
+.label3d {
+    padding: 1px 4px;
+    background-color: #ffffff;
+    border: 1px solid #888888;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: #000066;
+}
+
+.label3d.achse {
+    background: none;
+    border: none;
+    font-weight: bold;
+    color: #222222;
+}
+
+#close3d {
+    display: none;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+    z-index: 3;
+    width: 2.5em;
+    height: 2.5em;
+    font-size: 1.2em;
+}
+
+@media (min-width: 1500px) {
+    .grid-container {
+        grid-template-areas:
+        'header header header header header header header'
+        'left middle middle middle middle right view3d'
+        'footer footer footer footer footer footer footer';
+    }
+
+    #view3d {
+        grid-area: view3d;
+        display: block;
+        margin: 10px 10px 10px 0;
+    }
+
+    #open3d {
+        display: none;
+    }
+}
+
+@media (max-width: 1499px) {
+    #view3d.offen {
+        display: block;
+        position: fixed;
+        inset: 0;
+        height: auto;
+        z-index: 100;
+    }
+
+    #view3d.offen #close3d {
+        display: block;
+    }
+}

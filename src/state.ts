@@ -29,14 +29,21 @@ export const myScreen = {
     svgWidth: 700,
 };
 
-/** Breite der Grafik an die Fensterbreite anpassen. */
+/** Ab dieser Fensterbreite steht die 3D-Ansicht neben der 2D-Grafik (gleicher Wert wie in main.css). */
+export const breitBildschirm = window.matchMedia('(min-width: 1500px)');
+
+/** Breite der 2D-Grafik (und daneben der 3D-Ansicht) an die Fensterbreite anpassen. */
 export function updateSvgWidth(): void {
     const clientWidth = document.documentElement.clientWidth;
-    if (clientWidth > 1500) {
-        myScreen.svgWidth = clientWidth - 900;
+    if (breitBildschirm.matches) {
+        // 2D- und 3D-Grafik teilen sich den Platz rechts neben Eingabe und Querschnittswerten
+        myScreen.svgWidth = Math.max(500, Math.floor((clientWidth - 940) / 2));
         byId('my-svg').style.width = myScreen.svgWidth + 'px';
+        byId('view3d').style.width = myScreen.svgWidth + 'px';
     } else {
         myScreen.svgWidth = 700;
+        byId('my-svg').style.width = '';
+        byId('view3d').style.width = '';
     }
 }
 

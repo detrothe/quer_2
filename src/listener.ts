@@ -1,6 +1,7 @@
 import {app, byId, selectedCellPoly, updateSvgWidth} from './state';
 import {appendRow, polyTable} from './tabelle';
 import {CQuer_polygon} from './calc/quer1';
+import {sigmaFunktion} from './calc/spannung';
 import {zeichneQuerschnitt} from './grafik';
 
 /** Zelleninhalt als Zahl lesen (Komma erlaubt); ungültige Werte rot markieren und als 0 werten. */
@@ -63,17 +64,13 @@ function rechnen(): void {
     quer.calc();
 
     // Spannungen in den Eckpunkten
-    const Normalkraft = inputNumber('N_kraft');
-    const My = 100.0 * inputNumber('My');   // in kNcm
-    const Mz = 100.0 * inputNumber('Mz');   // in kNcm
-
-    const nenner = quer.Iy_s * quer.Iz_s - quer.Iyz_s * quer.Iyz_s;
+    const sigma = sigmaFunktion(quer, {
+        N: inputNumber('N_kraft'),
+        My: 100.0 * inputNumber('My'),   // in kNcm
+        Mz: 100.0 * inputNumber('Mz'),   // in kNcm
+    });
     for (let i = 0; i < npkte; i++) {
-        const yi = y[i] - quer.ys;
-        const zi = z[i] - quer.zs;
-        const sigma = Normalkraft / quer.area
-            + ((quer.Iz_s * zi - quer.Iyz_s * yi) * My - (quer.Iy_s * yi - quer.Iyz_s * zi) * Mz) / nenner;
-        tbody.rows[i].cells[3].innerText = sigma.toFixed(3);
+        tbody.rows[i].cells[3].innerText = sigma(y[i], z[i]).toFixed(3);
     }
 
     const ausgabe: [string, number][] = [
@@ -90,6 +87,9 @@ function rechnen(): void {
     for (const [id, wert] of ausgabe) byId(id).innerText = wert.toFixed(2);
 
     zeichneQuerschnitt(quer);
+
+    // three.js erst bei Bedarf laden (eigener Chunk, hält den Start schnell)
+    import('./grafik3d').then(m => m.zeichne3D(quer, sigma));
 }
 
 export function initButtons(): void {

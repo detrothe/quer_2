@@ -4,6 +4,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
     // relative Pfade, damit die App auch in einem Unterverzeichnis läuft
     base: './',
+    // three.js ist als eigener, nachgeladener Chunk bewusst groß
+    build: {chunkSizeWarningLimit: 800},
     plugins: [
         VitePWA({
             registerType: 'autoUpdate',

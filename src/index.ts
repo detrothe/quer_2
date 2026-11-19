@@ -19,6 +19,10 @@ init_contextmenu();
 initButtons();
 initDateien();
 
+// 3D-Ansicht auf schmalen Bildschirmen als Vollbild ein-/ausblenden
+byId('open3d').addEventListener('click', () => byId('view3d').classList.add('offen'));
+byId('close3d').addEventListener('click', () => byId('view3d').classList.remove('offen'));
+
 byId<HTMLInputElement>('input_pkte').value = '10';
 createPolyTable();
 initTouchOverlay();
