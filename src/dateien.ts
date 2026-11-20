@@ -87,7 +87,7 @@ function handleFileSelect_read(): void {
 }
 
 /** Download über einen temporären Link (für Browser ohne showSaveFilePicker). */
-function download(blob: Blob, filename: string): void {
+export function download(blob: Blob, filename: string): void {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -120,6 +120,30 @@ async function handleFileSelect_save(): Promise<void> {
         if (!filename) return;
         download(blob, filename);
         byId('id_dateiname').textContent = filename;
+    }
+}
+
+/**
+ * PNG-Bild speichern: mit Dateidialog, wenn vorhanden, sonst als Download.
+ * Der Dateidialog muss direkt aus dem Klick heraus geöffnet werden – das Bild wird deshalb erst danach erzeugt.
+ */
+export async function bildSpeichern(erzeugeBild: () => Promise<Blob>, vorschlag: string): Promise<void> {
+    try {
+        if (app.hasFSAccess && window.showSaveFilePicker) {
+            const fileHandle = await window.showSaveFilePicker({
+                suggestedName: vorschlag,
+                types: [{description: 'PNG-Bild', accept: {'image/png': ['.png']}}],
+            });
+            const blob = await erzeugeBild();
+            const fileStream = await fileHandle.createWritable();
+            await fileStream.write(blob);
+            await fileStream.close();
+        } else {
+            download(await erzeugeBild(), vorschlag);
+        }
+    } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        void alertdialog('ok', error instanceof Error ? error.message : String(error));
     }
 }
 

@@ -3,6 +3,7 @@ import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls.js';
 import {CSS2DObject, CSS2DRenderer} from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import GUI from 'lil-gui';
 import {byId} from './state';
+import {bildSpeichern} from './dateien';
 import {enableTouchHints} from './components/touch_hint';
 import {CQuer_polygon} from './calc/quer1';
 import type {SigmaFunktion} from './calc/spannung';
@@ -43,7 +44,11 @@ const optionen = {
     achsen: true,
     skalierung: 1,
     fangweite: 20,   // Pixel
+    bildFaktor: 2,   // Bildexport: Vielfaches der Bildschirmgröße (CSS-Pixel)
+    bildWeiss: true,   // Bildexport mit weißem statt grauem Hintergrund
 };
+
+const MAX_BILDPIXEL = 16_000_000;   // Obergrenze für Canvas-Flächen in Safari/iOS (ca. 16,7 Mio. Pixel)
 
 /*
  * Fingerbedienung wie in d2beam-gui (Tab Ergebnisse): Ein Button links unten schaltet um,
@@ -64,6 +69,7 @@ let camera: THREE.PerspectiveCamera;
 let controls: OrbitControls;
 let host: HTMLElement;
 let groessenBeobachter: ResizeObserver | null = null;
+let bildButtonName: ((name: string) => void) | null = null;
 
 // aktuelles Modell
 let modell: THREE.Group | null = null;
@@ -117,6 +123,7 @@ function resize(): void {
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     if (kameraNachholen) kameraZuruecksetzen();
+    bildNameAktualisieren();
     render();
     if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y, letzterZeiger.springen);   // Kreuz bleibt auf der Pfeilspitze
 }
@@ -226,6 +233,16 @@ function init(): void {
     gui.add(optionen, 'fangweite', 5, 60, 1).name('Fangweite [px]').onChange(() => {
         if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y, letzterZeiger.springen);
     });
+
+    const bild = gui.addFolder('Bild speichern');
+    bild.add(optionen, 'bildFaktor', {'1×': 1, '2×': 2, '3×': 3, '4×': 4, '6×': 6, '8×': 8})
+        .name('Auflösung').onChange(bildNameAktualisieren);
+    bild.add(optionen, 'bildWeiss').name('weißer Hintergrund');
+    const knopf = bild.add({speichern: () => void bildExportieren()}, 'speichern');
+    bildButtonName = name => knopf.name(name);
+    bildNameAktualisieren();
+    bild.close();
+
     gui.add({
         reset() {
             optionen.skalierung = 1;
@@ -236,6 +253,7 @@ function init(): void {
             render();
         },
     }, 'reset').name('Reset');
+
     if (window.matchMedia('(max-width: 600px)').matches) gui.close();
 }
 
@@ -397,15 +415,37 @@ function bestimmeInnenpunkte(poly: Punkt[], sigma: SigmaFunktion): Punkt[] {
     return punkte;
 }
 
+/**
+ * Spannungspfeile: Schaft als Linie (dünn wie bisher), Spitze als Kegel mit derselben Teilung wie die
+ * Achsenpfeile – der Kegel von THREE.ArrowHelper hat nur 5 Segmente, was im hochaufgelösten Bild eckig wirkt.
+ */
 function bauePfeile(punkte: Punkt[], maxAbs: number): THREE.Group {
     const g = new THREE.Group();
+    // gemeinsame Einheitskegel (Spitze in +Z, Fuß bei z = 0) und Materialien für alle Pfeile
+    const kegel = new THREE.ConeGeometry(0.5, 1, KREISTEILUNG);
+    kegel.translate(0, 0.5, 0);
+    kegel.rotateX(Math.PI / 2);
+    const material = {
+        zug: [new THREE.LineBasicMaterial({color: FARBE_ZUG}), new THREE.MeshStandardMaterial({color: FARBE_ZUG})],
+        druck: [new THREE.LineBasicMaterial({color: FARBE_DRUCK}), new THREE.MeshStandardMaterial({color: FARBE_DRUCK})],
+    } as const;
+
     for (const p of punkte) {
         const laenge = Math.abs(p.s) * hoehenFaktor;
         if (laenge < 1e-9 * groesse) continue;
         // Spitzengröße wächst mit der Spannung, damit kleine Spannungen nicht von Pfeilspitzen dominiert werden
         const kopf = Math.min(laenge * 0.9, groesse * 0.05 * optionen.skalierungPfeile * Math.abs(p.s) / maxAbs);
-        const dir = new THREE.Vector3(0, 0, Math.sign(p.s));
-        g.add(new THREE.ArrowHelper(dir, toV(p.y, p.z), laenge, p.s > 0 ? FARBE_ZUG : FARBE_DRUCK, kopf, kopf * 0.5));
+        const richtung = Math.sign(p.s);
+        const [linienMat, kegelMat] = p.s > 0 ? material.zug : material.druck;
+        const fuss = toV(p.y, p.z);
+
+        const schaft = new THREE.Line(new THREE.BufferGeometry().setFromPoints([
+            fuss, toV(p.y, p.z, richtung * (laenge - kopf)),
+        ]), linienMat);
+        const spitze = new THREE.Mesh(kegel, kegelMat);
+        spitze.position.copy(toV(p.y, p.z, richtung * (laenge - kopf)));
+        spitze.scale.set(kopf * 0.5, kopf * 0.5, richtung * kopf);   // Breite wie bisher (ArrowHelper: kopf · 0,5)
+        g.add(schaft, spitze);
     }
     return g;
 }
@@ -613,6 +653,88 @@ function fangen(x: number, y: number, springen: boolean): void {
     } else {
         wertAnzeige.style.display = 'none';
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------
+// Bildexport (PNG) der aktuellen Ansicht
+
+/** Tatsächlicher Vergrößerungsfaktor: gewünschter Faktor, begrenzt durch WebGL und die Canvas-Fläche. */
+function bildFaktor(): number {
+    const w = host.clientWidth, h = host.clientHeight;
+    if (w === 0 || h === 0) return optionen.bildFaktor;
+    const gl = renderer.getContext();
+    const maxSeite = Math.min(gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number, renderer.capabilities.maxTextureSize);
+    return Math.min(optionen.bildFaktor, maxSeite / Math.max(w, h), Math.sqrt(MAX_BILDPIXEL / (w * h)));
+}
+
+function bildNameAktualisieren(): void {
+    if (!bildButtonName || !host) return;
+    const f = bildFaktor();
+    const w = Math.round(host.clientWidth * f), h = Math.round(host.clientHeight * f);
+    bildButtonName(w > 0 ? `PNG speichern (${w} × ${h} px)` : 'PNG speichern');
+}
+
+/**
+ * Szene in höherer Auflösung rendern und die (HTML-)Beschriftungen dazuzeichnen.
+ * Alles geschieht in einer Aufgabe ohne Zwischenzeichnen des Browsers – auf dem Schirm flackert nichts,
+ * und der WebGL-Puffer ist beim Kopieren noch gültig (preserveDrawingBuffer ist nicht nötig).
+ */
+function bildErzeugen(): Promise<Blob> {
+    const w = host.clientWidth, h = host.clientHeight;
+    const f = bildFaktor();
+    const bw = Math.round(w * f), bh = Math.round(h * f);
+
+    const leinwand = document.createElement('canvas');
+    leinwand.width = bw;
+    leinwand.height = bh;
+    const ctx = leinwand.getContext('2d')!;
+
+    const altRatio = renderer.getPixelRatio();
+    const altFarbe = renderer.getClearColor(new THREE.Color());
+    if (optionen.bildWeiss) renderer.setClearColor(0xffffff);
+    renderer.setPixelRatio(f);
+    renderer.setSize(w, h, false);
+    renderer.render(scene, camera);
+    ctx.drawImage(renderer.domElement, 0, 0, bw, bh);
+    renderer.setClearColor(altFarbe);
+    renderer.setPixelRatio(altRatio);
+    renderer.setSize(w, h, false);
+    render();
+
+    // Beschriftungen: Lage und Aussehen aus dem DOM des CSS2DRenderer übernehmen
+    const basis = labelRenderer.domElement.getBoundingClientRect();
+    ctx.scale(f, f);
+    for (const el of labelRenderer.domElement.querySelectorAll<HTMLElement>('.label3d')) {
+        if (el.style.display === 'none' || !el.textContent) continue;
+        const r = el.getBoundingClientRect();
+        const st = getComputedStyle(el);
+        const x = r.left - basis.left, y = r.top - basis.top;
+        const rand = parseFloat(st.borderTopWidth) || 0;
+        if (st.backgroundColor !== 'rgba(0, 0, 0, 0)' && st.backgroundColor !== 'transparent') {
+            ctx.fillStyle = st.backgroundColor;
+            ctx.beginPath();
+            ctx.roundRect(x, y, r.width, r.height, parseFloat(st.borderTopLeftRadius) || 0);
+            ctx.fill();
+            if (rand > 0) {
+                ctx.strokeStyle = st.borderTopColor;
+                ctx.lineWidth = rand;
+                ctx.stroke();
+            }
+        }
+        ctx.fillStyle = st.color;
+        ctx.font = `${st.fontStyle} ${st.fontWeight} ${st.fontSize} ${st.fontFamily}`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(el.textContent, x + r.width / 2, y + r.height / 2);
+    }
+
+    return new Promise((resolve, reject) => leinwand.toBlob(
+        b => b ? resolve(b) : reject(new Error('Bild konnte nicht erzeugt werden (zu groß?)')), 'image/png'));
+}
+
+async function bildExportieren(): Promise<void> {
+    if (!aktQuer || host.clientWidth === 0) return;
+    await bildSpeichern(bildErzeugen, 'querschnitt_3d.png');
 }
 
 //----------------------------------------------------------------------------------------------------------------------
