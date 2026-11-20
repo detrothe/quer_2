@@ -46,8 +46,8 @@ export function setzeAnzahl(n: number): void {
 export function tabelleZeilenGeaendert(ev: Event): void {
     const n = (ev as CustomEvent).detail.value;
     byId<drButtonPM>(ZAEHLER_ID).setValue(n);
-    // Attribut nachziehen: sonst bliebe dort die alte Zahl stehen, und ein späteres Setzen auf genau
-    // diesen Wert über den Zähler würde kein attributeChangedCallback (und keine Größenänderung) auslösen
+    // Attribut auf der tatsächlichen Zeilenzahl halten (nur der Übersichtlichkeit halber; nötig ist es nicht,
+    // denn attributeChangedCallback läuft bei jedem setAttribute, auch mit unverändertem Wert)
     tabelleElement().setAttribute('nzeilen', String(n));
 }
 
