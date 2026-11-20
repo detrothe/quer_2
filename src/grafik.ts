@@ -9,38 +9,116 @@ const SCHRIFT = {
     size: 15, alignment: 'left', baseline: 'baseline',
 } as const;
 
+const FANGWEITE = 20;   // Pixel, wie in der 3D-Ansicht und in d2beam-gui
+
 let two: Two | null = null;
 let trans: CTrans | null = null;
-let tooltip: HTMLDivElement | null = null;
+
+// Schwerpunkt der aktuellen Zeichnung (für das Fangen)
+let schwerpunkt: { px: number; pz: number; ys: number; zs: number; elem: SVGElement | null } | null = null;
+
+// Fangkreuz (Finger/Stift) und Wertanzeige neben dem Cursor
+let cursorH: SVGLineElement;
+let cursorV: SVGLineElement;
+let cursorSvg: SVGSVGElement;
+let wertAnzeige: HTMLDivElement;
+
+/** Farbe aus einer CSS-Variablen von #my-svg (Farbschema der Grafik in main.css). */
+function farbe(name: string, ersatz: string): string {
+    return getComputedStyle(byId('my-svg')).getPropertyValue(name).trim() || ersatz;
+}
 
 function getTwo(): Two {
     if (!two) {
         const svg = byId('dataviz_area') as unknown as SVGSVGElement;
         two = new Two({domElement: svg, width: myScreen.svgWidth, height: myScreen.svgHeight});
-
-        // Cursor-Koordinaten in Weltkoordinaten anzeigen
-        svg.addEventListener('mousemove', ev => {
-            if (!trans) return;
-            const rect = svg.getBoundingClientRect();
-            const y = trans.yWorld(ev.clientX - rect.left).toFixed(1);
-            const z = trans.zWorld(ev.clientY - rect.top).toFixed(1);
-            byId('cursor_coordy').innerHTML = 'y&#772;:' + y;
-            byId('cursor_coordz').innerHTML = 'z&#772;:' + z;
-        });
+        initAbfrage(svg);
     }
     return two;
 }
 
-function getTooltip(): HTMLDivElement {
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.style.position = 'absolute';
-        tooltip.style.visibility = 'hidden';
-        tooltip.style.zIndex = '10';
-        tooltip.textContent = 'Schwerpunkt';
-        byId('my-svg').appendChild(tooltip);
+//----------------------------------------------------------------------------------------------------------------------
+// Koordinatenanzeige und Fangen am Schwerpunkt – Maus, Stift und Finger
+
+function initAbfrage(svg: SVGSVGElement): void {
+    const container = byId('my-svg');
+    const svgNS = 'http://www.w3.org/2000/svg';
+    cursorSvg = document.createElementNS(svgNS, 'svg');
+    cursorSvg.classList.add('grafik-cursor');
+    cursorH = document.createElementNS(svgNS, 'line');
+    cursorV = document.createElementNS(svgNS, 'line');
+    cursorSvg.append(cursorH, cursorV);
+    container.appendChild(cursorSvg);
+
+    wertAnzeige = document.createElement('div');
+    wertAnzeige.className = 'grafik-wert';
+    container.appendChild(wertAnzeige);
+    abfrageAusblenden();
+
+    const bewegt = (ev: PointerEvent) => {
+        if (!trans) return;
+        const rect = svg.getBoundingClientRect();
+        let x = ev.clientX - rect.left;
+        let y = ev.clientY - rect.top;
+        // Finger: Cursor über dem Finger, damit man sieht, wo man ist (wie in 3D und d2beam-gui)
+        if (ev.pointerType === 'touch') y -= Math.hypot(rect.width, rect.height) / 10;
+        abfragen(x, y, ev.pointerType !== 'mouse');
+    };
+    svg.addEventListener('pointermove', bewegt);
+    svg.addEventListener('pointerdown', bewegt);
+    svg.addEventListener('pointerleave', ev => {
+        if (ev.pointerType === 'mouse') abfrageAusblenden();
+    });
+}
+
+function abfrageAusblenden(): void {
+    cursorSvg.style.display = 'none';
+    wertAnzeige.style.display = 'none';
+    if (schwerpunkt?.elem) schwerpunkt.elem.style.fill = '';
+}
+
+/** Koordinaten an (x, y) anzeigen; liegt der Schwerpunkt innerhalb der Fangweite, dort einrasten. */
+function abfragen(x: number, y: number, kreuz: boolean): void {
+    if (!trans) return;
+    const gefangen = !!schwerpunkt && Math.hypot(schwerpunkt.px - x, schwerpunkt.pz - y) <= FANGWEITE;
+    if (gefangen && schwerpunkt) {
+        x = schwerpunkt.px;
+        y = schwerpunkt.pz;
     }
-    return tooltip;
+
+    const yw = gefangen && schwerpunkt ? schwerpunkt.ys : trans.yWorld(x);
+    const zw = gefangen && schwerpunkt ? schwerpunkt.zs : trans.zWorld(y);
+    byId('cursor_coordy').innerHTML = 'y&#772;: ' + yw.toFixed(1);
+    byId('cursor_coordz').innerHTML = 'z&#772;: ' + zw.toFixed(1);
+
+    // Fangkreuz nur bei Finger/Stift (die Maus hat ihren eigenen Zeiger)
+    cursorSvg.style.display = kreuz ? 'block' : 'none';
+    cursorSvg.classList.toggle('gefangen', gefangen);
+    cursorH.setAttribute('x1', String(x - FANGWEITE));
+    cursorH.setAttribute('x2', String(x + FANGWEITE));
+    cursorH.setAttribute('y1', String(y));
+    cursorH.setAttribute('y2', String(y));
+    cursorV.setAttribute('x1', String(x));
+    cursorV.setAttribute('x2', String(x));
+    cursorV.setAttribute('y1', String(y - FANGWEITE));
+    cursorV.setAttribute('y2', String(y + FANGWEITE));
+
+    if (schwerpunkt?.elem) schwerpunkt.elem.style.fill = gefangen ? 'orange' : '';
+
+    if (gefangen && schwerpunkt) {
+        wertAnzeige.innerHTML = `<b>Schwerpunkt</b><br>y<sub>s</sub> = ${schwerpunkt.ys.toFixed(2)}&nbsp; z<sub>s</sub> = ${schwerpunkt.zs.toFixed(2)} cm`;
+        wertAnzeige.style.display = 'block';
+        // rechts oben neben das Kreuz, am Rand nach innen klappen
+        const w = byId('my-svg').clientWidth;
+        const bw = wertAnzeige.offsetWidth, bh = wertAnzeige.offsetHeight;
+        let lx = x + FANGWEITE + 6, ly = y - FANGWEITE - bh - 2;
+        if (lx + bw > w) lx = x - FANGWEITE - 6 - bw;
+        if (ly < 0) ly = y + FANGWEITE + 2;
+        wertAnzeige.style.left = lx + 'px';
+        wertAnzeige.style.top = ly + 'px';
+    } else {
+        wertAnzeige.style.display = 'none';
+    }
 }
 
 /**
@@ -108,8 +186,8 @@ export function zeichneQuerschnitt(quer: CQuer_polygon): boolean {
     const punkte: number[] = [];
     for (let i = 0; i < neck; i++) punkte.push(py(y[i]), pz(z[i]));
     const polygon = t.makePath(...punkte);
-    polygon.stroke = 'dimgrey';
-    polygon.fill = 'lightgrey';
+    polygon.stroke = farbe('--querschnitt-rand', 'dimgrey');
+    polygon.fill = farbe('--querschnitt-flaeche', 'lightgrey');
     polygon.linewidth = 1;
 
     const sl = Math.min(ymax - ymin, zmax - zmin) / 3;
@@ -144,28 +222,15 @@ export function zeichneQuerschnitt(quer: CQuer_polygon): boolean {
     pfeil(t, a2.y1, a2.z1, a2.y2, a2.z2, 'black', 2);
     text(t, ' 2', a2.y2 + 5, a2.z2 - 5);
 
-    // Schwerpunkt mit Tooltip
-    const schwerpunkt = t.makeCircle(ys, zs, 5);
-    schwerpunkt.fill = 'blue';
-    schwerpunkt.noStroke();
+    // Schwerpunkt (Fangen und Anzeige siehe abfragen)
+    const kreis = t.makeCircle(ys, zs, 5);
+    kreis.fill = 'blue';
+    kreis.noStroke();
 
     t.update();
 
-    const elem = (schwerpunkt.renderer as { elem?: SVGElement }).elem;
-    if (elem) {
-        const tip = getTooltip();
-        elem.addEventListener('mouseover', () => {
-            elem.style.fill = 'orange';
-            tip.style.visibility = 'visible';
-        });
-        elem.addEventListener('mousemove', ev => {
-            tip.style.top = ev.pageY - 20 + 'px';
-            tip.style.left = ev.pageX + 10 + 'px';
-        });
-        elem.addEventListener('mouseout', () => {
-            elem.style.fill = 'blue';
-            tip.style.visibility = 'hidden';
-        });
-    }
+    schwerpunkt = {px: ys, pz: zs, ys: quer.ys, zs: quer.zs,
+        elem: (kreis.renderer as { elem?: SVGElement }).elem ?? null};
+    abfrageAusblenden();
     return true;
 }

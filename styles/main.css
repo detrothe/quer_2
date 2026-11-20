@@ -113,14 +113,11 @@ sl-tab-panel::part(base) {
     padding: 0.5rem 0.75rem;
 }
 
-/* 3D-Ansicht füllt den ganzen Tab */
-sl-tab-panel[name="drei_d"]::part(base) {
-    padding: 0;
-}
-
+/* 3D-Ansicht füllt den Tab (mit kleinem Rand und runden Ecken wie die 2D-Grafik) */
 sl-tab-panel[name="drei_d"],
 sl-tab-panel[name="drei_d"]::part(base) {
     height: 100%;
+    box-sizing: border-box;
 }
 
 h3 {
@@ -248,20 +245,65 @@ table.werte td.zahl,
 
 /* 2D-Grafik: füllt den restlichen Platz, Höhe bis zum unteren Fensterrand */
 #my-svg {
+    /* Farbschema der 2D-Grafik (Querschnitt wird in grafik.ts mit diesen Farben gezeichnet) */
+    --grafik-hintergrund: #ffffff;
+    --querschnitt-flaeche: #dfe6ee;
+    --querschnitt-rand: #34495e;
+
     position: relative;
     flex: 1 1 22rem;
     min-width: 18rem;
     height: calc(100dvh - 5rem);
     min-height: 20rem;
-    background-color: rgb(110, 180, 180);
-    border-radius: 4px;
+    background-color: var(--grafik-hintergrund);
+    border-radius: 6px;
     overflow: hidden;
+}
+
+/* schmale Bildschirme: Grafik niedriger, damit man oberhalb noch scrollen kann
+   (über der Grafik selbst gehören die Fingerbewegungen der Koordinatenanzeige) */
+@media (max-width: 700px) {
+    #my-svg {
+        height: 70dvh;
+    }
 }
 
 #dataviz_area {
     display: block;
     width: 100%;
     height: 100%;
+    touch-action: none;
+    cursor: crosshair;
+}
+
+.grafik-cursor {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.grafik-cursor line {
+    stroke: #000000;
+    stroke-width: 1.5;
+}
+
+.grafik-cursor.gefangen line {
+    stroke: #e08000;
+    stroke-width: 2.5;
+}
+
+.grafik-wert {
+    position: absolute;
+    padding: 3px 6px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #222222;
+    border: 1px solid #888888;
+    border-radius: 3px;
+    font-size: 0.9em;
+    white-space: nowrap;
+    pointer-events: none;
 }
 
 #cursor_coord {
@@ -318,6 +360,7 @@ table.werte td.zahl,
     overscroll-behavior: contain;
     background-color: #dddddd;
     color: #222222;
+    border-radius: 6px;
     overflow: hidden;
 }
 
@@ -424,18 +467,17 @@ table.werte td.zahl,
     color: #222222;
 }
 
-/* Umschalter Pan / Werte für Fingereingabe – wie in d2beam-gui links unten */
+/* Umschalter Pan / Werte für Fingereingabe – links unten wie in d2beam-gui,
+   Aussehen wie die Datei-Buttons (.btn_file) im Tab Eingabe */
 #view3d-pan {
     position: absolute;
     bottom: 1rem;
-    left: 0.5rem;
+    left: 0.75rem;
     z-index: 3;
     margin: 0;
-    padding: 0.4375rem 0.75rem;
-    border: none;
-    border-radius: 0;
-    font-size: 1rem;
-    line-height: 0;
-    background-color: #181818;
-    color: #f1f1f1;
+}
+
+#view3d-pan svg {
+    width: 1.3rem;
+    height: 1.3rem;
 }
