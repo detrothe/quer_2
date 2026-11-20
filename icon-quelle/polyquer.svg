@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#3a8ee6"/><stop offset="1" stop-color="#0a347f"/>
+  </linearGradient>
+  <linearGradient id="metall" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff"/><stop offset="0.45" stop-color="#e3e7eb"/><stop offset="1" stop-color="#8e98a4"/>
+  </linearGradient>
+  <linearGradient id="druck" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#ffb000"/><stop offset="1" stop-color="#ff6a00"/>
+  </linearGradient>
+  <linearGradient id="zug" x1="1" y1="0" x2="0" y2="0">
+    <stop offset="0" stop-color="#ffe14d"/><stop offset="1" stop-color="#ffc400"/>
+  </linearGradient>
+  <filter id="schatten" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="6"/><feOffset dy="6" result="b"/><feFlood flood-color="#001a40" flood-opacity="0.45"/><feComposite in2="b" operator="in"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <marker id="pfeil" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="#ffd21f"/>
+  </marker>
+</defs>
+<rect width="512" height="512" fill="url(#bg)"/>
+<g id="figur" transform="translate(262 236) scale(0.88) translate(-272 -232)">
+<path filter="url(#schatten)" fill="url(#metall)" stroke="#5d6875" stroke-width="2"
+  d="M96,128 L320,128 L320,176 L236,192 L236,336 L180,336 L180,192 L96,176 z"/>
+<g stroke="#ffd21f" stroke-width="7" stroke-linecap="round" fill="none">
+    <line x1="208" y1="196" x2="146" y2="196" marker-end="url(#pfeil)"/>
+    <line x1="208" y1="196" x2="208" y2="258" marker-end="url(#pfeil)"/>
+  </g>
+  <circle cx="208" cy="196" r="10" fill="#ffd21f" stroke="#0a347f" stroke-width="3"/>
+<g filter="url(#schatten)">
+    <path d="M392,128 L426,128 L392,196 z" fill="url(#druck)"/>
+    <path d="M392,196 L322,336 L392,336 z" fill="url(#zug)"/>
+  </g>
+  <line x1="426" y1="128" x2="322" y2="336" stroke="#ffffff" stroke-opacity="0.85" stroke-width="3"/>
+  <line x1="392" y1="120" x2="392" y2="344" stroke="#e9edf1" stroke-width="4"/>
+</g>
+<text x="256" y="418" text-anchor="middle" font-family="Noto Sans" font-weight="700" font-size="52" fill="#e9edf1">polyQuer</text>
+</svg>

@@ -13,7 +13,9 @@ export default defineConfig({
         VitePWA({
             registerType: 'autoUpdate',
             injectRegister: 'auto',
-            includeAssets: ['polyquer.png'],
+            includeAssets: ['favicon-48.png', 'apple-touch-icon.png'],
+            // Manifest-Icons nicht zusätzlich vorab cachen (die 512er braucht nur die Installation)
+            includeManifestIcons: false,
             manifest: {
                 name: 'polygonal begrenzter Querschnitt',
                 short_name: 'polyQuer',
@@ -26,17 +28,17 @@ export default defineConfig({
                 // keine Themenfarbe: Browser-/Statusleiste behält die Standardfarbe des Browsers.
                 // Ausdrücklich undefined, sonst setzt vite-plugin-pwa ihr Standardgrün #42b883 ein.
                 theme_color: undefined,
+                // Icons wie bei d2beam-gui; Vorlage: icon-quelle/polyquer.svg (mit Inkscape gerendert)
                 icons: [
-                    {
-                        src: 'polyquer.png',
-                        sizes: '192x192',
-                        type: 'image/png',
-                        purpose: 'any',
-                    },
+                    {src: '192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any'},
+                    {src: '512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any'},
+                    {src: 'maskable_512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable'},
                 ],
             },
             workbox: {
                 globPatterns: ['**/*.{js,css,html,png,woff2}'],
+                // große Icons braucht nur die Installation, nicht der Offline-Betrieb
+                globIgnores: ['**/512x512.png', '**/maskable_512.png'],
             },
         }),
     ],
