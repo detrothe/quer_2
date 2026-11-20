@@ -62,6 +62,7 @@ let scene: THREE.Scene;
 let camera: THREE.PerspectiveCamera;
 let controls: OrbitControls;
 let host: HTMLElement;
+let groessenBeobachter: ResizeObserver | null = null;
 
 // aktuelles Modell
 let modell: THREE.Group | null = null;
@@ -204,7 +205,10 @@ function init(): void {
         if (ev.pointerType === 'mouse') cursorAusblenden();
     });
 
-    new ResizeObserver(resize).observe(host);
+    // Referenz behalten: ein nicht referenzierter ResizeObserver kann vom Garbage Collector
+    // entfernt werden – dann bekommt die Ansicht beim Einblenden des Tabs keine Größe mehr
+    groessenBeobachter = new ResizeObserver(resize);
+    groessenBeobachter.observe(host);
 
     const neuAufbauen = () => {
         baueSpannungskoerper();

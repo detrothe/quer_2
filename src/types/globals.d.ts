@@ -18,3 +18,6 @@ interface Window {
     showSaveFilePicker?: (options?: SaveFilePickerOptions) => Promise<FileSystemFileHandle>;
     showOpenFilePicker?: unknown;
 }
+
+/** Versionsnummer aus package.json (vite.config.ts, define) */
+declare const __APP_VERSION__: string;

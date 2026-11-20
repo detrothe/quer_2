@@ -1,4 +1,4 @@
-import {byId, myScreen} from './state';
+import {myScreen} from './state';
 
 /** Transformation zwischen Weltkoordinaten (y, z in cm) und Pixeln der Grafik. */
 export class CTrans {
@@ -29,7 +29,7 @@ export class CTrans {
         this.dy = this.ymax - this.ymin;
         this.dz = this.zmax - this.zmin;
 
-        this.height = byId('my-svg').clientHeight - 1;
+        this.height = myScreen.svgHeight - 1;
         this.width = myScreen.svgWidth - 1;
 
         // gleicher Maßstab in y- und z-Richtung

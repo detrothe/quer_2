@@ -1,43 +1,41 @@
 import {app, byId} from './state';
-import {polyTable} from './tabelle';
-import {resize_polyTabelle} from './listener';
+import {leseRohwerte, setzePunkte, MIN_PUNKTE} from './punkte';
 
 /**
- * Dateiformat (JSON). Y und Z werden wie bisher als serialisiertes
- * Float64Array gespeichert, also als Objekt {"0": .., "1": ..}.
- * Beim Einlesen werden Objekt und Array gleichermaßen akzeptiert.
+ * Dateiformat (JSON). Y und Z werden wie bisher als Objekt {"0": .., "1": ..} gespeichert
+ * (früher ein serialisiertes Float64Array). Beim Einlesen werden Objekt und Array akzeptiert.
  */
 interface PolyData {
     npkte: string | number;
     N: string;
     My: string;
     Mz: string;
-    Y: Record<number, number | null>;
-    Z: Record<number, number | null>;
+    Y: Record<number, number | string | null>;
+    Z: Record<number, number | string | null>;
 }
 
 function input(id: string): HTMLInputElement {
     return byId<HTMLInputElement>(id);
 }
 
+/** Text einer Zelle als Zahl wie früher (leer → 0, ungültig → null). */
+function alsZahl(text: string): number | null {
+    const wert = Number(text.replace(/,/g, '.'));
+    return Number.isFinite(wert) ? wert : null;
+}
+
 /** Aktuelle Eingabe (Punkte und Schnittgrößen) als JSON-Text. */
 export function eingabeAlsJSON(): string {
-    const rows = polyTable().tBodies[0].rows;
-
-    const y = new Float64Array(rows.length);
-    const z = new Float64Array(rows.length);
-    for (let i = 0; i < rows.length; i++) {
-        y[i] = Number(rows[i].cells[1].innerText);
-        z[i] = Number(rows[i].cells[2].innerText);
-    }
+    const {y, z} = leseRohwerte();
+    const alsObjekt = (werte: string[]) => Object.fromEntries(werte.map((w, i) => [i, alsZahl(w)]));
 
     return JSON.stringify({
-        npkte: input('input_pkte').value,
+        npkte: String(y.length),
         N: input('N_kraft').value.replace(/,/g, '.'),
         My: input('My').value.replace(/,/g, '.'),
         Mz: input('Mz').value.replace(/,/g, '.'),
-        Y: y,
-        Z: z,
+        Y: alsObjekt(y),
+        Z: alsObjekt(z),
     });
 }
 
@@ -53,23 +51,17 @@ export function eingabeEinlesen(json: string): boolean {
         return false;
     }
     const npkte = Number(jobj?.npkte);
-    if (!Number.isInteger(npkte) || npkte < 3 || typeof jobj.Y !== 'object' || typeof jobj.Z !== 'object') {
+    if (!Number.isInteger(npkte) || npkte < MIN_PUNKTE || typeof jobj.Y !== 'object' || typeof jobj.Z !== 'object') {
         return false;
     }
 
-    input('input_pkte').value = String(npkte);
     input('N_kraft').value = jobj.N ?? '';
     input('My').value = jobj.My ?? '';
     input('Mz').value = jobj.Mz ?? '';
 
-    resize_polyTabelle();
-
-    const rows = polyTable().tBodies[0].rows;
-    for (let i = 0; i < rows.length; i++) {
-        rows[i].cells[1].innerText = String(jobj.Y[i] ?? '');
-        rows[i].cells[2].innerText = String(jobj.Z[i] ?? '');
-        rows[i].cells[3].innerText = '';
-    }
+    const y = Array.from({length: npkte}, (_, i) => jobj.Y[i] ?? '');
+    const z = Array.from({length: npkte}, (_, i) => jobj.Z[i] ?? '');
+    setzePunkte(y, z);
     return true;
 }
 
@@ -82,7 +74,9 @@ function handleFileSelect_read(): void {
 
         const reader = new FileReader();
         reader.onload = () => {
-            if (!eingabeEinlesen(String(reader.result))) {
+            if (eingabeEinlesen(String(reader.result))) {
+                byId('id_dateiname').textContent = file.name;
+            } else {
                 alert('Die Datei enthält keine gültigen Querschnittsdaten.');
             }
         };
@@ -114,6 +108,7 @@ async function handleFileSelect_save(): Promise<void> {
             const fileStream = await fileHandle.createWritable();
             await fileStream.write(blob);
             await fileStream.close();
+            byId('id_dateiname').textContent = fileHandle.name;
         } catch (error) {
             // Abbruch im Dateidialog ist kein Fehler
             if (error instanceof DOMException && error.name === 'AbortError') return;
@@ -123,6 +118,7 @@ async function handleFileSelect_save(): Promise<void> {
         const filename = window.prompt('Name der Datei mit Extension, z.B. test.txt\nDie Datei wird im Default Download Ordner gespeichert');
         if (!filename) return;
         download(blob, filename);
+        byId('id_dateiname').textContent = filename;
     }
 }
 

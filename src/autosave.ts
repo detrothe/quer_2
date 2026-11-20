@@ -1,6 +1,6 @@
 import {app} from './state';
 import {eingabeAlsJSON, eingabeEinlesen} from './dateien';
-import {rechnen} from './listener';
+import {rechnen} from './rechnen';
 
 /*
  * Eingabe automatisch sichern und wiederherstellen (wie in d2beam-gui).
@@ -41,7 +41,7 @@ function wiederherstellen(): void {
     try {
         const daten = JSON.parse(text) as Sicherung;
         if (!eingabeEinlesen(daten.eingabe)) throw new Error('gespeicherte Eingabe wurde abgelehnt');
-        if (daten.gerechnet) rechnen();
+        if (daten.gerechnet) rechnen(false);
     } catch (error) {
         // Defekte/inkompatible Sicherung: aufheben, löschen und mit der Starteingabe weitermachen,
         // damit die App nicht bei jedem Start erneut daran scheitert.

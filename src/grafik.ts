@@ -4,7 +4,10 @@ import {byId, myScreen} from './state';
 import {CTrans} from './trans';
 import {CQuer_polygon} from './calc/quer1';
 
-const SCHRIFT = {family: 'Verdana, Arial, Helvetica, sans-serif', size: 15, alignment: 'left', baseline: 'baseline'} as const;
+const SCHRIFT = {
+    family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    size: 15, alignment: 'left', baseline: 'baseline',
+} as const;
 
 let two: Two | null = null;
 let trans: CTrans | null = null;
@@ -13,7 +16,7 @@ let tooltip: HTMLDivElement | null = null;
 function getTwo(): Two {
     if (!two) {
         const svg = byId('dataviz_area') as unknown as SVGSVGElement;
-        two = new Two({domElement: svg, width: myScreen.svgWidth, height: svg.height.baseVal.value});
+        two = new Two({domElement: svg, width: myScreen.svgWidth, height: myScreen.svgHeight});
 
         // Cursor-Koordinaten in Weltkoordinaten anzeigen
         svg.addEventListener('mousemove', ev => {
@@ -69,8 +72,17 @@ function text(t: Two, inhalt: string, x: number, y: number, farbe = 'black'): vo
     t.makeText(inhalt, x, y, {...SCHRIFT, fill: farbe});
 }
 
-/** Querschnitt, Koordinatensysteme, Hauptachsen und Schwerpunkt zeichnen. */
-export function zeichneQuerschnitt(quer: CQuer_polygon): void {
+/**
+ * Querschnitt, Koordinatensysteme, Hauptachsen und Schwerpunkt zeichnen.
+ * Die Grafik füllt ihren Container (#my-svg). Ist er nicht sichtbar (anderer Tab aktiv),
+ * wird nichts gezeichnet und false zurückgegeben – dann beim Einblenden erneut aufrufen.
+ */
+export function zeichneQuerschnitt(quer: CQuer_polygon): boolean {
+    const container = byId('my-svg');
+    if (container.clientWidth === 0 || container.clientHeight === 0) return false;
+    myScreen.svgWidth = container.clientWidth;
+    myScreen.svgHeight = container.clientHeight;
+
     const {y, z, neck} = quer;
 
     let ymin = Infinity, zmin = Infinity, ymax = -Infinity, zmax = -Infinity;
@@ -82,9 +94,9 @@ export function zeichneQuerschnitt(quer: CQuer_polygon): void {
     }
 
     const t = getTwo();
-    const svg = t.renderer.domElement as SVGSVGElement;
-    t.renderer.setSize(myScreen.svgWidth, svg.height.baseVal.value);
+    t.renderer.setSize(myScreen.svgWidth, myScreen.svgHeight);
     t.width = myScreen.svgWidth;
+    t.height = myScreen.svgHeight;
     t.clear();
 
     const tr = new CTrans(ymin, zmin, ymax, zmax);
@@ -155,4 +167,5 @@ export function zeichneQuerschnitt(quer: CQuer_polygon): void {
             tip.style.visibility = 'hidden';
         });
     }
+    return true;
 }

@@ -1,11 +1,14 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import pkg from './package.json' with { type: 'json' };
 
 export default defineConfig({
     // relative Pfade, damit die App auch in einem Unterverzeichnis läuft
     base: './',
     // three.js ist als eigener, nachgeladener Chunk bewusst groß
     build: {chunkSizeWarningLimit: 800},
+    // Versionsnummer für den Tab Info
+    define: {__APP_VERSION__: JSON.stringify(pkg.version)},
     plugins: [
         VitePWA({
             registerType: 'autoUpdate',
