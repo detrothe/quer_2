@@ -71,7 +71,6 @@ let seitenGruppe: THREE.Group | null = null;
 let innenPfeilGruppe: THREE.Group | null = null;
 let achsenGruppe: THREE.Group | null = null;
 let beschriftungGruppe: THREE.Group | null = null;
-let marker: THREE.Mesh;
 
 let aktQuer: CQuer_polygon | null = null;
 let aktSigma: SigmaFunktion | null = null;
@@ -86,8 +85,10 @@ let kameraNachholen = false;   // Kamera konnte nicht eingestellt werden, weil d
 let cursorSvg: SVGSVGElement;
 let cursorH: SVGLineElement;
 let cursorV: SVGLineElement;
+let ring: SVGCircleElement;   // markiert die gefangene Pfeilspitze (wie in der 2D-Grafik)
 let wertAnzeige: HTMLDivElement;
-let letzterZeiger: { x: number; y: number } | null = null;
+// springen: Kreuz rastet auf der Pfeilspitze ein (Finger/Stift); bei der Maus bleibt es unter dem Zeiger
+let letzterZeiger: { x: number; y: number; springen: boolean } | null = null;
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -116,7 +117,7 @@ function resize(): void {
     camera.updateProjectionMatrix();
     if (kameraNachholen) kameraZuruecksetzen();
     render();
-    if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y);   // Kreuz bleibt auf der Pfeilspitze
+    if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y, letzterZeiger.springen);   // Kreuz bleibt auf der Pfeilspitze
 }
 
 /**
@@ -150,7 +151,10 @@ function initCursor(): void {
     cursorSvg.classList.add('view3d-cursor');
     cursorH = document.createElementNS(svgNS, 'line');
     cursorV = document.createElementNS(svgNS, 'line');
-    cursorSvg.append(cursorH, cursorV);
+    ring = document.createElementNS(svgNS, 'circle');
+    ring.setAttribute('r', '7');
+    ring.classList.add('ring');
+    cursorSvg.append(ring, cursorH, cursorV);
     host.appendChild(cursorSvg);
 
     wertAnzeige = document.createElement('div');
@@ -190,13 +194,9 @@ function init(): void {
     renderer.domElement.style.cursor = 'none';
     controls.addEventListener('change', () => {
         render();
-        if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y);   // Spitzen haben sich auf dem Schirm bewegt
+        if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y, letzterZeiger.springen);   // Spitzen haben sich auf dem Schirm bewegt
     });
 
-    // Markierung der gefangenen Pfeilspitze
-    marker = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 12), new THREE.MeshBasicMaterial({color: 0x000000}));
-    marker.visible = false;
-    scene.add(marker);
 
     const canvas = renderer.domElement;
     canvas.addEventListener('pointermove', zeigerBewegt);
@@ -223,7 +223,7 @@ function init(): void {
     gui.add(optionen, 'skalierungPfeile', 0.2, 3, 0.1).name('Skalierung Pfeile').onChange(neuAufbauen);
     gui.add(optionen, 'achsen').name('Achsen anzeigen').onChange(sichtbarkeit);
     gui.add(optionen, 'fangweite', 5, 60, 1).name('Fangweite [px]').onChange(() => {
-        if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y);
+        if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y, letzterZeiger.springen);
     });
     gui.add({
         reset() {
@@ -496,7 +496,7 @@ function sichtbarkeit(): void {
     if (innenPfeilGruppe) innenPfeilGruppe.visible = optionen.innenPfeile;
     if (achsenGruppe) achsenGruppe.visible = optionen.achsen;
     if (beschriftungGruppe) beschriftungGruppe.visible = optionen.beschriftung && optionen.normalspannung;
-    if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y);
+    if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y, letzterZeiger.springen);
     render();
 }
 
@@ -507,10 +507,6 @@ function cursorAusblenden(): void {
     letzterZeiger = null;
     cursorSvg.style.display = 'none';
     wertAnzeige.style.display = 'none';
-    if (marker?.visible) {
-        marker.visible = false;
-        render();
-    }
 }
 
 /** Button links unten: ein Finger verschiebt (Pan) oder fragt Werte ab (123). Nur auf Touch-Geräten. */
@@ -546,12 +542,16 @@ function zeigerBewegt(ev: PointerEvent): void {
         // Cursor über dem Finger, damit man sieht, wo man ist (wie d2beam-gui)
         y -= Math.hypot(host.clientWidth, host.clientHeight) / 10;
     }
-    letzterZeiger = {x, y};
-    fangen(x, y);
+    const springen = ev.pointerType !== 'mouse';
+    letzterZeiger = {x, y, springen};
+    fangen(x, y, springen);
 }
 
-/** Kreuz an (x, y) zeichnen und die nächste Pfeilspitze innerhalb der Fangweite suchen. */
-function fangen(x: number, y: number): void {
+/**
+ * Kreuz an (x, y) zeichnen und die nächste Pfeilspitze innerhalb der Fangweite suchen.
+ * Die Spitze wird mit einem Ring markiert; mit springen = true (Finger/Stift) rastet auch das Kreuz dort ein.
+ */
+function fangen(x: number, y: number, springen: boolean): void {
     const w = host.clientWidth, h = host.clientHeight;
     const fw = optionen.fangweite;
 
@@ -571,13 +571,20 @@ function fangen(x: number, y: number): void {
         }
     }
 
-    // gefangen: Kreuz auf die Pfeilspitze setzen
-    let cx = x, cy = y;
+    // Lage der gefangenen Spitze auf dem Schirm; Finger/Stift: Kreuz dorthin setzen
+    let cx = x, cy = y, rx = 0, ry = 0;
     if (best && bestPos) {
         const s = bestPos.clone().project(camera);
-        cx = (s.x + 1) / 2 * w;
-        cy = (1 - s.y) / 2 * h;
+        rx = (s.x + 1) / 2 * w;
+        ry = (1 - s.y) / 2 * h;
+        if (springen) {
+            cx = rx;
+            cy = ry;
+        }
     }
+    ring.setAttribute('cx', String(rx));
+    ring.setAttribute('cy', String(ry));
+    ring.style.display = best ? '' : 'none';
 
     cursorSvg.style.display = 'block';
     cursorH.setAttribute('x1', String(cx - fw));
@@ -590,7 +597,6 @@ function fangen(x: number, y: number): void {
     cursorV.setAttribute('y2', String(cy + fw));
     cursorSvg.classList.toggle('gefangen', !!best);
 
-    const markerVorher = marker.visible;
     if (best && bestPos) {
         wertAnzeige.innerHTML =
             `<b>σ = ${best.s.toFixed(3)}</b> kN/cm²<br>y&#772; = ${best.y.toFixed(2)}&nbsp; z&#772; = ${best.z.toFixed(2)} cm`;
@@ -602,15 +608,9 @@ function fangen(x: number, y: number): void {
         if (ly < 0) ly = cy + fw + 2;
         wertAnzeige.style.left = lx + 'px';
         wertAnzeige.style.top = ly + 'px';
-
-        marker.position.copy(bestPos);
-        marker.scale.setScalar(groesse * 0.01);
-        marker.visible = true;
     } else {
         wertAnzeige.style.display = 'none';
-        marker.visible = false;
     }
-    if (markerVorher || marker.visible) render();
 }
 
 //----------------------------------------------------------------------------------------------------------------------

@@ -105,7 +105,7 @@ sl-tab-group::part(nav) {
     }
 
     sl-tab[active]::part(base) {
-        color: #4da3ff;
+        color: var(--user_accent, #4da3ff);   /* Akzentfarbe aus Tab ꔷꔷꔷ */
     }
 }
 
@@ -203,10 +203,17 @@ hr {
     opacity: 1;
 }
 
-/* Eingabe nach dem letzten Rechnen geändert */
+/* Berechnung erforderlich (noch nicht gerechnet oder Eingabe geändert): Akzentfarbe wie in d2beam-gui */
 .btn_rechnen.veraltet {
-    outline: 3px solid var(--sl-color-warning-500);
-    outline-offset: 1px;
+    background-color: var(--sl-color-primary-600);
+    border-color: var(--sl-color-primary-600);
+    color: var(--sl-color-neutral-0);
+}
+
+@media (prefers-color-scheme: dark) {
+    .btn_rechnen.veraltet {
+        color: #ffffff;
+    }
 }
 
 /*----------------------------------------------------------------------------------------- Ergebnisse */
@@ -294,6 +301,17 @@ table.werte td.zahl,
     stroke-width: 2.5;
 }
 
+/* Maus: nur der Ring um den gefangenen Punkt, kein Kreuz */
+.grafik-cursor.ohne_kreuz line {
+    display: none;
+}
+
+.grafik-cursor .ring {
+    fill: none;
+    stroke: #e08000;
+    stroke-width: 2.5;
+}
+
 .grafik-wert {
     position: absolute;
     padding: 3px 6px;
@@ -320,6 +338,78 @@ table.werte td.zahl,
 
 #cursor_coordz {
     margin-left: 1rem;
+}
+
+/*----------------------------------------------------------------------------------------- Einstellungen */
+
+/* Akzentfarbe (Tab ꔷꔷꔷ, aus d2beam-gui global.css): ersetzt das Shoelace-Blau, wenn <html data-accent>
+   gesetzt ist; die Stufen werden aus der einen Farbe gemischt. Im dunklen Design kehrt Shoelace sie um. */
+:root[data-accent] {
+    accent-color: var(--user_accent);
+    --sl-color-primary-50: color-mix(in srgb, var(--user_accent) 7%, white);
+    --sl-color-primary-100: color-mix(in srgb, var(--user_accent) 15%, white);
+    --sl-color-primary-200: color-mix(in srgb, var(--user_accent) 30%, white);
+    --sl-color-primary-300: color-mix(in srgb, var(--user_accent) 50%, white);
+    --sl-color-primary-400: color-mix(in srgb, var(--user_accent) 70%, white);
+    --sl-color-primary-500: color-mix(in srgb, var(--user_accent) 85%, white);
+    --sl-color-primary-600: var(--user_accent);
+    --sl-color-primary-700: color-mix(in srgb, var(--user_accent) 85%, black);
+    --sl-color-primary-800: color-mix(in srgb, var(--user_accent) 70%, black);
+    --sl-color-primary-900: color-mix(in srgb, var(--user_accent) 55%, black);
+    --sl-color-primary-950: color-mix(in srgb, var(--user_accent) 40%, black);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root[data-accent] {
+        --sl-color-primary-50: color-mix(in srgb, var(--user_accent) 40%, black);
+        --sl-color-primary-100: color-mix(in srgb, var(--user_accent) 55%, black);
+        --sl-color-primary-200: color-mix(in srgb, var(--user_accent) 70%, black);
+        --sl-color-primary-300: color-mix(in srgb, var(--user_accent) 85%, black);
+        --sl-color-primary-400: color-mix(in srgb, var(--user_accent) 92%, black);
+        --sl-color-primary-500: color-mix(in srgb, var(--user_accent) 96%, black);
+        --sl-color-primary-600: var(--user_accent);
+        --sl-color-primary-700: color-mix(in srgb, var(--user_accent) 85%, white);
+        --sl-color-primary-800: color-mix(in srgb, var(--user_accent) 70%, white);
+        --sl-color-primary-900: color-mix(in srgb, var(--user_accent) 50%, white);
+        --sl-color-primary-950: color-mix(in srgb, var(--user_accent) 15%, white);
+    }
+}
+
+table.einstellungen td {
+    padding: 0.3rem 0.75rem 0.3rem 0;
+    white-space: nowrap;
+}
+
+/* Farbauswahl: Quadrat mit abgerundeten Ecken (wie d2beam-gui) */
+sl-color-picker::part(trigger) {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+}
+
+.accent_row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+#id_cb_saveLocalStorage.speichern_hinweis {
+    outline: 3px solid var(--sl-color-primary-600);
+    outline-offset: 2px;
+    font-weight: 700;
+}
+
+/* [hidden] ausdrücklich, sonst überschreibt display: inline-block das hidden-Attribut */
+.speichern_hinweis_text[hidden] {
+    display: none;
+}
+
+.speichern_hinweis_text {
+    display: inline-block;
+    margin-top: 0.4rem;
+    font-size: 0.875rem;
+    color: var(--sl-color-primary-600);
+    font-weight: 600;
 }
 
 /*----------------------------------------------------------------------------------------- Info */
@@ -382,11 +472,18 @@ table.werte td.zahl,
     pointer-events: none;
 }
 
+/* Controls-Panel schwebt wie das Info-Feld mit Abstand zum Rand */
 #view3d-gui {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 10px;
+    left: 10px;
     z-index: 2;
+}
+
+/* ganzes Panel abrunden (Titel und aufgeklappter Bereich), nicht nur die Ecke der 3D-Fläche */
+#view3d-gui .lil-gui.lil-root {
+    border-radius: 6px;
+    overflow: hidden;
 }
 
 /* lil-gui im Stil der Dünnwand-App: größere Schrift, gelbe Titelleiste */
@@ -398,8 +495,9 @@ table.werte td.zahl,
     --title-height: 32px;
     --checkbox-size: 18px;
     --name-width: 55%;
-    --title-background-color: #b5b000;
-    --title-text-color: #ffffff;
+    /* Titelleiste in der Tabellenfarbe aus dem Tab ꔷꔷꔷ (wie das Bedienfeld in d2beam-gui) */
+    --title-background-color: var(--table_bg, #cfd915);
+    --title-text-color: var(--table_fg, #000000);
 }
 
 #view3d-info {
@@ -428,6 +526,12 @@ table.werte td.zahl,
 }
 
 .view3d-cursor.gefangen line {
+    stroke: #e08000;
+    stroke-width: 2.5;
+}
+
+.view3d-cursor .ring {
+    fill: none;
     stroke: #e08000;
     stroke-width: 2.5;
 }

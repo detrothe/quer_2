@@ -57,6 +57,7 @@ export class DrHaupt extends LitElement {
         <sl-tab slot="nav" panel="ergebnisse">Ergebnisse</sl-tab>
         <sl-tab slot="nav" panel="drei_d">3D</sl-tab>
         <sl-tab slot="nav" panel="info">Info</sl-tab>
+        <sl-tab slot="nav" panel="einstellungen" title="Einstellungen">ꔷꔷꔷ</sl-tab>
 
         <!------------------------------------------------------------------------------------- Eingabe -->
         <sl-tab-panel name="eingabe">
@@ -159,6 +160,43 @@ export class DrHaupt extends LitElement {
           <p id="infoBox"></p>
           <p class="footer">
             20.11.2026 <a href="https://statikverstehen.de">&#169; statikverstehen.de</a>
+          </p>
+        </sl-tab-panel>
+
+        <!---------------------------------------------------------------------------- Einstellungen -->
+        <sl-tab-panel name="einstellungen">
+          <h3>Einstellungen</h3>
+          <table class="einstellungen">
+            <tr>
+              <td>Hintergrundfarbe Tabellen:</td>
+              <td><sl-color-picker id="id_color_table_out" value="#cfd915" format="hex" hoist
+                swatches="#cfd915;#b3ae00;#ffffff;#f5f5f5;#d8d8d8;#828282;#404040;#000000;#0284c7;#2e7d32;#c62828;#ef6c00" label="Hintergrundfarbe Tabellen"></sl-color-picker></td>
+            </tr>
+            <tr>
+              <td>Textfarbe Tabellen:</td>
+              <td><sl-color-picker id="id_color_table_text" value="#000000" format="hex" hoist
+                swatches="#cfd915;#b3ae00;#ffffff;#f5f5f5;#d8d8d8;#828282;#404040;#000000;#0284c7;#2e7d32;#c62828;#ef6c00" label="Textfarbe Tabellen"
+                title="Wird beim Ändern der Hintergrundfarbe automatisch hell oder dunkel gesetzt"></sl-color-picker></td>
+            </tr>
+            <tr>
+              <td>Akzentfarbe:</td>
+              <td>
+                <div class="accent_row">
+                  <sl-color-picker id="id_accent_color" value="#0284c7" format="hex" hoist
+                    swatches="#cfd915;#b3ae00;#ffffff;#f5f5f5;#d8d8d8;#828282;#404040;#000000;#0284c7;#2e7d32;#c62828;#ef6c00" label="Akzentfarbe"
+                    title="Farbe für den aktiven Tab und den Rechnen-Button, wenn neu gerechnet werden muss"></sl-color-picker>
+                  <button type="button" id="id_accent_color_reset">Standard</button>
+                </div>
+              </td>
+            </tr>
+          </table>
+          <p class="hinweis">Die Tabellenfarbe gilt auch für die Titelleiste des Controls-Panels in der 3D-Ansicht.</p>
+          <p>
+            <button type="button" id="id_cb_saveLocalStorage">Auswahl als Standardwerte im Browser speichern</button>
+            <br /><span class="speichern_hinweis_text" id="id_speichern_hinweis" hidden>Es gibt Änderungen, die noch nicht gespeichert sind.</span>
+          </p>
+          <p>
+            <button type="button" id="id_cb_deleteLocalStorage">Standardwerte im Speicher des Browsers löschen</button>
           </p>
         </sl-tab-panel>
       </sl-tab-group>

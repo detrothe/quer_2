@@ -3,6 +3,7 @@ import type {Path} from 'two.js/src/path';
 import {byId, myScreen} from './state';
 import {CTrans} from './trans';
 import {CQuer_polygon} from './calc/quer1';
+import type {SigmaFunktion} from './calc/spannung';
 
 const SCHRIFT = {
     family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -14,14 +15,32 @@ const FANGWEITE = 20;   // Pixel, wie in der 3D-Ansicht und in d2beam-gui
 let two: Two | null = null;
 let trans: CTrans | null = null;
 
-// Schwerpunkt der aktuellen Zeichnung (für das Fangen)
-let schwerpunkt: { px: number; pz: number; ys: number; zs: number; elem: SVGElement | null } | null = null;
+/** Punkt, an dem der Cursor einrastet (Eckpunkte und Schwerpunkt), mit Text für die Wertanzeige. */
+interface Fangpunkt {
+    px: number;
+    pz: number;
+    y: number;          // Weltkoordinaten (Eingabe)
+    z: number;
+    html: string;       // Inhalt der Wertanzeige
+    istSchwerpunkt: boolean;
+}
 
-// Fangkreuz (Finger/Stift) und Wertanzeige neben dem Cursor
+let fangpunkte: Fangpunkt[] = [];
+let schwerpunktElem: SVGElement | null = null;
+
+// Fangkreuz (Finger/Stift), Ring um den gefangenen Punkt und Wertanzeige neben dem Cursor
 let cursorH: SVGLineElement;
 let cursorV: SVGLineElement;
+let ring: SVGCircleElement;
 let cursorSvg: SVGSVGElement;
 let wertAnzeige: HTMLDivElement;
+
+/** Daten der Eingabe für die Wertanzeige an den Eckpunkten. */
+export interface Eingabepunkte {
+    y: ArrayLike<number>;
+    z: ArrayLike<number>;
+    sigma: SigmaFunktion;
+}
 
 /** Farbe aus einer CSS-Variablen von #my-svg (Farbschema der Grafik in main.css). */
 function farbe(name: string, ersatz: string): string {
@@ -38,7 +57,7 @@ function getTwo(): Two {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
-// Koordinatenanzeige und Fangen am Schwerpunkt – Maus, Stift und Finger
+// Koordinatenanzeige und Fangen an Eckpunkten und Schwerpunkt – Maus, Stift und Finger
 
 function initAbfrage(svg: SVGSVGElement): void {
     const container = byId('my-svg');
@@ -47,7 +66,10 @@ function initAbfrage(svg: SVGSVGElement): void {
     cursorSvg.classList.add('grafik-cursor');
     cursorH = document.createElementNS(svgNS, 'line');
     cursorV = document.createElementNS(svgNS, 'line');
-    cursorSvg.append(cursorH, cursorV);
+    ring = document.createElementNS(svgNS, 'circle');
+    ring.setAttribute('r', '7');
+    ring.classList.add('ring');
+    cursorSvg.append(ring, cursorH, cursorV);
     container.appendChild(cursorSvg);
 
     wertAnzeige = document.createElement('div');
@@ -74,26 +96,36 @@ function initAbfrage(svg: SVGSVGElement): void {
 function abfrageAusblenden(): void {
     cursorSvg.style.display = 'none';
     wertAnzeige.style.display = 'none';
-    if (schwerpunkt?.elem) schwerpunkt.elem.style.fill = '';
+    if (schwerpunktElem) schwerpunktElem.style.fill = '';
 }
 
-/** Koordinaten an (x, y) anzeigen; liegt der Schwerpunkt innerhalb der Fangweite, dort einrasten. */
+/** Koordinaten an (x, y) anzeigen; liegt ein Eck- oder der Schwerpunkt innerhalb der Fangweite, dort einrasten. */
 function abfragen(x: number, y: number, kreuz: boolean): void {
     if (!trans) return;
-    const gefangen = !!schwerpunkt && Math.hypot(schwerpunkt.px - x, schwerpunkt.pz - y) <= FANGWEITE;
-    if (gefangen && schwerpunkt) {
-        x = schwerpunkt.px;
-        y = schwerpunkt.pz;
+
+    let fang: Fangpunkt | null = null;
+    let bestD = FANGWEITE;
+    for (const p of fangpunkte) {
+        const d = Math.hypot(p.px - x, p.pz - y);
+        if (d <= bestD) {
+            bestD = d;
+            fang = p;
+        }
+    }
+    if (fang) {
+        x = fang.px;
+        y = fang.pz;
     }
 
-    const yw = gefangen && schwerpunkt ? schwerpunkt.ys : trans.yWorld(x);
-    const zw = gefangen && schwerpunkt ? schwerpunkt.zs : trans.zWorld(y);
+    const yw = fang ? fang.y : trans.yWorld(x);
+    const zw = fang ? fang.z : trans.zWorld(y);
     byId('cursor_coordy').innerHTML = 'y&#772;: ' + yw.toFixed(1);
     byId('cursor_coordz').innerHTML = 'z&#772;: ' + zw.toFixed(1);
 
-    // Fangkreuz nur bei Finger/Stift (die Maus hat ihren eigenen Zeiger)
-    cursorSvg.style.display = kreuz ? 'block' : 'none';
-    cursorSvg.classList.toggle('gefangen', gefangen);
+    // Fangkreuz nur bei Finger/Stift (die Maus hat ihren eigenen Zeiger), Ring bei jedem gefangenen Punkt
+    cursorSvg.style.display = kreuz || fang ? 'block' : 'none';
+    cursorSvg.classList.toggle('gefangen', !!fang);
+    cursorSvg.classList.toggle('ohne_kreuz', !kreuz);
     cursorH.setAttribute('x1', String(x - FANGWEITE));
     cursorH.setAttribute('x2', String(x + FANGWEITE));
     cursorH.setAttribute('y1', String(y));
@@ -102,11 +134,14 @@ function abfragen(x: number, y: number, kreuz: boolean): void {
     cursorV.setAttribute('x2', String(x));
     cursorV.setAttribute('y1', String(y - FANGWEITE));
     cursorV.setAttribute('y2', String(y + FANGWEITE));
+    ring.setAttribute('cx', String(x));
+    ring.setAttribute('cy', String(y));
+    ring.style.display = fang && !fang.istSchwerpunkt ? '' : 'none';
 
-    if (schwerpunkt?.elem) schwerpunkt.elem.style.fill = gefangen ? 'orange' : '';
+    if (schwerpunktElem) schwerpunktElem.style.fill = fang?.istSchwerpunkt ? 'orange' : '';
 
-    if (gefangen && schwerpunkt) {
-        wertAnzeige.innerHTML = `<b>Schwerpunkt</b><br>y<sub>s</sub> = ${schwerpunkt.ys.toFixed(2)}&nbsp; z<sub>s</sub> = ${schwerpunkt.zs.toFixed(2)} cm`;
+    if (fang) {
+        wertAnzeige.innerHTML = fang.html;
         wertAnzeige.style.display = 'block';
         // rechts oben neben das Kreuz, am Rand nach innen klappen
         const w = byId('my-svg').clientWidth;
@@ -119,6 +154,33 @@ function abfragen(x: number, y: number, kreuz: boolean): void {
     } else {
         wertAnzeige.style.display = 'none';
     }
+}
+
+/** Fangpunkte: Eckpunkte der Eingabe (doppelte Punkte zusammengefasst) und Schwerpunkt. */
+function bestimmeFangpunkte(quer: CQuer_polygon, eingabe: Eingabepunkte | undefined,
+                            py: (v: number) => number, pz: (v: number) => number): Fangpunkt[] {
+    const punkte: Fangpunkt[] = [];
+    if (eingabe) {
+        const nummern = new Map<string, number[]>();
+        for (let i = 0; i < eingabe.y.length; i++) {
+            const key = `${eingabe.y[i]}|${eingabe.z[i]}`;
+            nummern.set(key, [...(nummern.get(key) ?? []), i + 1]);
+        }
+        for (const [key, nr] of nummern) {
+            const [y, z] = key.split('|').map(Number);
+            const titel = nr.length > 1 ? `Punkte ${nr.join(', ')}` : `Punkt ${nr[0]}`;
+            punkte.push({
+                px: py(y), pz: pz(z), y, z, istSchwerpunkt: false,
+                html: `<b>${titel}</b><br>y&#772; = ${y.toFixed(2)}&nbsp; z&#772; = ${z.toFixed(2)} cm`
+                    + `<br>&sigma; = <b>${eingabe.sigma(y, z).toFixed(3)}</b> kN/cm²`,
+            });
+        }
+    }
+    punkte.push({
+        px: py(quer.ys), pz: pz(quer.zs), y: quer.ys, z: quer.zs, istSchwerpunkt: true,
+        html: `<b>Schwerpunkt</b><br>y<sub>s</sub> = ${quer.ys.toFixed(2)}&nbsp; z<sub>s</sub> = ${quer.zs.toFixed(2)} cm`,
+    });
+    return punkte;
 }
 
 /**
@@ -155,7 +217,7 @@ function text(t: Two, inhalt: string, x: number, y: number, farbe = 'black'): vo
  * Die Grafik füllt ihren Container (#my-svg). Ist er nicht sichtbar (anderer Tab aktiv),
  * wird nichts gezeichnet und false zurückgegeben – dann beim Einblenden erneut aufrufen.
  */
-export function zeichneQuerschnitt(quer: CQuer_polygon): boolean {
+export function zeichneQuerschnitt(quer: CQuer_polygon, eingabe?: Eingabepunkte): boolean {
     const container = byId('my-svg');
     if (container.clientWidth === 0 || container.clientHeight === 0) return false;
     myScreen.svgWidth = container.clientWidth;
@@ -229,8 +291,8 @@ export function zeichneQuerschnitt(quer: CQuer_polygon): boolean {
 
     t.update();
 
-    schwerpunkt = {px: ys, pz: zs, ys: quer.ys, zs: quer.zs,
-        elem: (kreis.renderer as { elem?: SVGElement }).elem ?? null};
+    schwerpunktElem = (kreis.renderer as { elem?: SVGElement }).elem ?? null;
+    fangpunkte = bestimmeFangpunkte(quer, eingabe, py, pz);
     abfrageAusblenden();
     return true;
 }

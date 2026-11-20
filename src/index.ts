@@ -8,6 +8,7 @@ import {setzeAnzahl, setzePunkte, leereTabelle, zaehlerGeaendert, ZAEHLER_ID, ST
 import {rechnen, zeichne2D} from './rechnen';
 import {initDateien} from './dateien';
 import {initAutosave} from './autosave';
+import {initEinstellungen} from './einstellungen';
 
 // dunkles Theme von Shoelace über die Klasse sl-theme-dark (wie d2beam-gui)
 const dunkel = window.matchMedia('(prefers-color-scheme: dark)');
@@ -51,7 +52,10 @@ async function start(): Promise<void> {
     byId('neueEingabe').addEventListener('click', neueEingabe);
     byId(ZAEHLER_ID).addEventListener('change', zaehlerGeaendert);
     initDateien();
+    initEinstellungen();
     geraeteInfo();
+    // vor dem ersten Rechnen ist eine Berechnung erforderlich → Rechnen-Button in Akzentfarbe
+    byId('rechnen').classList.add('veraltet');
 
     // nach dem Rechnen auf den Tab Ergebnisse wechseln
     document.addEventListener('berechnet', ev => {
@@ -59,9 +63,9 @@ async function start(): Promise<void> {
         byId('rechnen').classList.remove('veraltet');
         if ((ev as CustomEvent).detail?.zeigeErgebnisse) haupt.zeigeTab('ergebnisse');
     });
-    // Eingabe geändert → Rechnen-Button hervorheben
+    // Eingabe geändert → Rechnen-Button in Akzentfarbe (wie d2beam-gui)
     document.addEventListener('berechnung-erforderlich', () => {
-        if (app.gerechnet) byId('rechnen').classList.add('veraltet');
+        byId('rechnen').classList.add('veraltet');
     });
     for (const id of ['N_kraft', 'My', 'Mz']) {
         byId(id).addEventListener('input', () => document.dispatchEvent(new CustomEvent('berechnung-erforderlich')));

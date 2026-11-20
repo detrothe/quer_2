@@ -2,10 +2,10 @@ import {app, byId} from './state';
 import {lesePunkte, MIN_PUNKTE} from './punkte';
 import {CQuer_polygon} from './calc/quer1';
 import {sigmaFunktion, SigmaFunktion} from './calc/spannung';
-import {zeichneQuerschnitt} from './grafik';
+import {zeichneQuerschnitt, Eingabepunkte} from './grafik';
 
 /** Ergebnis der letzten Berechnung (für das Neuzeichnen beim Tab-Wechsel). */
-let letztes: { quer: CQuer_polygon; sigma: SigmaFunktion } | null = null;
+let letztes: { quer: CQuer_polygon; sigma: SigmaFunktion; eingabe: Eingabepunkte } | null = null;
 
 function inputNumber(id: string): number {
     const wert = Number(byId<HTMLInputElement>(id).value.replace(/,/g, '.'));
@@ -39,7 +39,7 @@ function schreibeErgebnisse(quer: CQuer_polygon, y: Float64Array, z: Float64Arra
 
 /** 2D-Grafik (neu) zeichnen, falls sie sichtbar ist. Aufruf auch beim Wechsel auf den Tab Ergebnisse. */
 export function zeichne2D(): void {
-    if (letztes) zeichneQuerschnitt(letztes.quer);
+    if (letztes) zeichneQuerschnitt(letztes.quer, letztes.eingabe);
 }
 
 /**
@@ -73,7 +73,7 @@ export function rechnen(zeigeErgebnisse = true): void {
         Mz: 100.0 * inputNumber('Mz'),   // in kNcm
     });
 
-    letztes = {quer, sigma};
+    letztes = {quer, sigma, eingabe: {y, z, sigma}};
     schreibeErgebnisse(quer, y, z, sigma);
     app.gerechnet = true;
     app.berechnungErforderlich = false;
