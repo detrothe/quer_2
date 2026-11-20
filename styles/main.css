@@ -529,7 +529,7 @@ sl-color-picker::part(trigger) {
 #view3d {
     position: relative;
     height: 100%;
-    /* Gesten gehören der 3D-Ansicht, auch über Info-Feld und Controls (sonst zoomt der Browser die Seite) */
+    /* Gesten gehören der 3D-Ansicht, auch über Info-Feld und Bedienfeld (sonst zoomt der Browser die Seite) */
     touch-action: none;
     -webkit-user-select: none;
     user-select: none;
@@ -558,7 +558,7 @@ sl-color-picker::part(trigger) {
     pointer-events: none;
 }
 
-/* Controls-Panel schwebt wie das Info-Feld mit Abstand zum Rand */
+/* Bedienfeld schwebt wie das Info-Feld mit Abstand zum Rand */
 #view3d-gui {
     position: absolute;
     top: 10px;
@@ -586,7 +586,7 @@ sl-color-picker::part(trigger) {
     --title-text-color: var(--table_fg, #000000);
 }
 
-/* rechts unten, damit es auf dem Smartphone nicht mit dem Controls-Panel überlappt;
+/* rechts unten, damit es auf dem Smartphone nicht mit dem Bedienfeld überlappt;
    ohne Hintergrund und durchlässig für Zeiger, damit es die Bedienung der Ansicht nicht stört */
 #view3d-info {
     position: absolute;

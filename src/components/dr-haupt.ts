@@ -197,7 +197,7 @@ export class DrHaupt extends LitElement {
               </td>
             </tr>
           </table>
-          <p class="hinweis">Die Tabellenfarbe gilt auch für die Titelleiste des Controls-Panels in der 3D-Ansicht.</p>
+          <p class="hinweis">Die Tabellenfarbe gilt auch für die Titelleiste des Bedienfelds in der 3D-Ansicht.</p>
           <p>
             <button type="button" id="id_cb_saveLocalStorage"
               title="Die gewählten Farben bleiben auch nach einem Neustart der App erhalten">Auswahl als Standardwerte im Browser speichern</button>

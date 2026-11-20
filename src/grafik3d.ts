@@ -222,7 +222,7 @@ function init(): void {
         baueSpannungskoerper();
         render();
     };
-    const gui = new GUI({container: byId('view3d-gui'), title: 'Controls'});
+    const gui = new GUI({container: byId('view3d-gui'), title: 'Bedienfeld'});
     gui.add(optionen, 'beschriftung').name('Beschriftung').onChange(sichtbarkeit);
     gui.add(optionen, 'normalspannung').name('Normalspannung').onChange(sichtbarkeit);
     gui.add(optionen, 'skalierung', 0.1, 5, 0.1).name('Skalierung').onChange(neuAufbauen);
@@ -252,7 +252,7 @@ function init(): void {
             kameraZuruecksetzen();
             render();
         },
-    }, 'reset').name('Reset');
+    }, 'reset').name('Zurücksetzen');
 
     if (window.matchMedia('(max-width: 600px)').matches) gui.close();
 }

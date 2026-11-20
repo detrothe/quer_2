@@ -5,7 +5,7 @@
  * „Auswahl als Standardwerte im Browser speichern“ – wie in d2beam-gui.
  *
  * Wirkung über CSS-Variablen am Dokument (werden auch in Shadow-DOMs vererbt):
- *   --table_bg / --table_fg  → dr-tabelle und Titelleiste des Controls-Panels in 3D
+ *   --table_bg / --table_fg  → dr-tabelle und Titelleiste des Bedienfelds in 3D
  *   --user_accent + <html data-accent> → Shoelace-Primärfarbe (aktiver Tab, Rechnen-Button …), siehe main.css
  */
 
