@@ -79,7 +79,8 @@ export class DrHaupt extends LitElement {
 
           <h3>Polygonpunkte</h3>
           <p class="hinweis">Punkte gegen den Uhrzeigersinn eingeben (so wie in der Grafik mit y&#772; nach links und
-            z&#772; nach unten dargestellt); Löcher über einen Schlitz (hin und zurück auf derselben Kante).
+            z&#772; nach unten dargestellt). Löcher über einen Schlitz (hin und zurück auf derselben Kante);
+            die Punkte des Lochrands sind dabei im Uhrzeigersinn einzugeben.
             Rechte Maustaste bzw. langes Drücken auf markierte Zellen öffnet das Kontextmenü.</p>
           <div class="zeile">
             <dr-button-pm id="${ZAEHLER_ID}" txt="Anzahl Punkte: " inputid="npkte" .nel="${START_Y.length}" .minValue="${3}"></dr-button-pm>
@@ -144,7 +145,8 @@ export class DrHaupt extends LitElement {
           <h4>Bedienung</h4>
           <ul>
             <li><b>Eingabe:</b> Punkte gegen den Uhrzeigersinn (in der Darstellung mit y&#772; nach links, z&#772; nach unten),
-              Löcher über einen Schlitz. Bei Eingabe im Uhrzeigersinn wird die Reihenfolge automatisch umgekehrt. Mehrere Zellen mit der Maus
+              Löcher über einen Schlitz, die Punkte des Lochrands im Uhrzeigersinn. Ist der ganze Umriss im
+              Uhrzeigersinn eingegeben, wird die Reihenfolge automatisch umgekehrt. Mehrere Zellen mit der Maus
               oder dem Finger markieren, dann Kontextmenü (rechte Maustaste / langes Drücken) zum Kopieren,
               Hochzählen und für die Zwischenablage.</li>
             <li><b>Ergebnisse:</b> Querschnittswerte, Spannungen in den Eckpunkten und Grafik des Querschnitts.</li>

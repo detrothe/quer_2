@@ -316,17 +316,38 @@ function baueQuerschnitt(quer: CQuer_polygon): THREE.Group {
     return g;
 }
 
+const KREISTEILUNG = 10;   // Segmente im Umfang von Schaft und Spitze der Achsenpfeile
+
+/** Räumlicher Pfeil (Zylinderschaft + Kegelspitze) vom Ursprung in Richtung dir. */
+function raumPfeil(dir: THREE.Vector3, laenge: number, farbe: number): THREE.Group {
+    const spitzeL = laenge * 0.25;
+    const schaftL = laenge - spitzeL;
+    const material = new THREE.MeshStandardMaterial({color: farbe});
+
+    const schaft = new THREE.Mesh(
+        new THREE.CylinderGeometry(laenge * 0.025, laenge * 0.025, schaftL, KREISTEILUNG), material);
+    schaft.position.y = schaftL / 2;
+    const spitze = new THREE.Mesh(
+        new THREE.ConeGeometry(laenge * 0.08, spitzeL, KREISTEILUNG), material);
+    spitze.position.y = schaftL + spitzeL / 2;
+
+    const pfeil = new THREE.Group();
+    pfeil.add(schaft, spitze);
+    // Zylinder und Kegel zeigen in +Y → auf die gewünschte Richtung drehen
+    pfeil.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+    return pfeil;
+}
+
 function baueAchsen(): THREE.Group {
     const g = new THREE.Group();
     const l = groesse * 0.25;
-    const k = l * 0.25, b = l * 0.12;
     const achsen: [THREE.Vector3, number, string][] = [
         [new THREE.Vector3(0, 0, 1), 0xdd2222, 'x'],
         [new THREE.Vector3(-1, 0, 0), 0x22aa44, 'y'],
         [new THREE.Vector3(0, -1, 0), 0x2222dd, 'z'],
     ];
     for (const [dir, farbe, name] of achsen) {
-        g.add(new THREE.ArrowHelper(dir, new THREE.Vector3(), l, farbe, k, b));
+        g.add(raumPfeil(dir, l, farbe));
         g.add(label(name, dir.clone().multiplyScalar(l * 1.12), 'label3d achse'));
     }
     return g;
