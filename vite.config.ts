@@ -24,10 +24,10 @@ export default defineConfig({
                 start_url: './',
                 scope: './',
                 display: 'standalone',
-                background_color: '#ffffff',
-                // keine Themenfarbe: Browser-/Statusleiste behält die Standardfarbe des Browsers.
-                // Ausdrücklich undefined, sonst setzt vite-plugin-pwa ihr Standardgrün #42b883 ein.
-                theme_color: undefined,
+                // wie d2beam-gui (helles Grau der Oberfläche); im Browser wählen die theme-color-Meta-Tags
+                // in index.html hell/dunkel passend zur Systemeinstellung
+                background_color: '#f3f3f3',
+                theme_color: '#f3f3f3',
                 // Icons wie bei d2beam-gui; Vorlage: icon-quelle/polyquer.svg (mit Inkscape gerendert)
                 icons: [
                     {src: '192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any'},

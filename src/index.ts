@@ -9,6 +9,7 @@ import {rechnen, zeichne2D} from './rechnen';
 import {initDateien} from './dateien';
 import {initAutosave} from './autosave';
 import {initEinstellungen} from './einstellungen';
+import {enableTouchHints} from './components/touch_hint';
 import {confirmdialog} from './components/confirm_dialog';
 
 // dunkles Theme von Shoelace über die Klasse sl-theme-dark (wie d2beam-gui)
@@ -55,6 +56,9 @@ async function start(): Promise<void> {
     byId(TABELLE_ID).addEventListener('rows-changed', tabelleZeilenGeaendert);
     initDateien();
     initEinstellungen();
+    // Hilfetext bei langem Drücken (Finger/Stift) bzw. Überfahren (Maus) wie in d2beam-gui
+    enableTouchHints(byId('id_file_toolbar'));
+    enableTouchHints(byId('id_panel_einstellungen'));
     geraeteInfo();
     // vor dem ersten Rechnen ist eine Berechnung erforderlich → Rechnen-Button in Akzentfarbe
     byId('rechnen').classList.add('veraltet');

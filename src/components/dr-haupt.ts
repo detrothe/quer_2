@@ -62,11 +62,12 @@ export class DrHaupt extends LitElement {
         <!------------------------------------------------------------------------------------- Eingabe -->
         <sl-tab-panel name="eingabe">
           <p class="dateiname">aktueller Dateiname: <span id="id_dateiname"></span></p>
-          <div class="file_toolbar">
+          <div class="file_toolbar" id="id_file_toolbar">
             <button type="button" id="neueEingabe" class="btn_file" title="neue Eingabe beginnen" aria-label="neue Eingabe beginnen">${ICON_NEU}</button>
             <button type="button" id="readFile" class="btn_file" title="Querschnitt einlesen" aria-label="Querschnitt einlesen">${ICON_EINLESEN}</button>
             <button type="button" id="saveFile" class="btn_file" title="Querschnitt speichern" aria-label="Querschnitt speichern">${ICON_SPEICHERN}</button>
-            <button type="button" id="rechnen" class="btn_rechnen">Rechnen</button>
+            <button type="button" id="rechnen" class="btn_rechnen"
+              title="Querschnittswerte und Spannungen berechnen (farbig hinterlegt, wenn die Eingabe geändert wurde)">Rechnen</button>
           </div>
 
           <hr />
@@ -168,7 +169,7 @@ export class DrHaupt extends LitElement {
         </sl-tab-panel>
 
         <!---------------------------------------------------------------------------- Einstellungen -->
-        <sl-tab-panel name="einstellungen">
+        <sl-tab-panel name="einstellungen" id="id_panel_einstellungen">
           <h3>Einstellungen</h3>
           <table class="einstellungen">
             <tr>
@@ -189,18 +190,20 @@ export class DrHaupt extends LitElement {
                   <sl-color-picker id="id_accent_color" value="#0284c7" format="hex" hoist
                     swatches="#cfd915;#b3ae00;#ffffff;#f5f5f5;#d8d8d8;#828282;#404040;#000000;#0284c7;#2e7d32;#c62828;#ef6c00" label="Akzentfarbe"
                     title="Farbe für den aktiven Tab und den Rechnen-Button, wenn neu gerechnet werden muss"></sl-color-picker>
-                  <button type="button" id="id_accent_color_reset">Standard</button>
+                  <button type="button" id="id_accent_color_reset" title="Akzentfarbe auf das Standard-Blau zurücksetzen">Standard</button>
                 </div>
               </td>
             </tr>
           </table>
           <p class="hinweis">Die Tabellenfarbe gilt auch für die Titelleiste des Controls-Panels in der 3D-Ansicht.</p>
           <p>
-            <button type="button" id="id_cb_saveLocalStorage">Auswahl als Standardwerte im Browser speichern</button>
+            <button type="button" id="id_cb_saveLocalStorage"
+              title="Die gewählten Farben bleiben auch nach einem Neustart der App erhalten">Auswahl als Standardwerte im Browser speichern</button>
             <br /><span class="speichern_hinweis_text" id="id_speichern_hinweis" hidden>Es gibt Änderungen, die noch nicht gespeichert sind.</span>
           </p>
           <p>
-            <button type="button" id="id_cb_deleteLocalStorage">Standardwerte im Speicher des Browsers löschen</button>
+            <button type="button" id="id_cb_deleteLocalStorage"
+              title="Gespeicherte Farben löschen und die Standardfarben wiederherstellen">Standardwerte im Speicher des Browsers löschen</button>
           </p>
         </sl-tab-panel>
       </sl-tab-group>
