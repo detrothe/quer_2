@@ -11,6 +11,7 @@ declare module 'detectos.js' {
 // File System Access API (noch nicht in lib.dom enthalten)
 interface SaveFilePickerOptions {
     suggestedName?: string;
+    startIn?: FileSystemHandle | string;
     types?: { description?: string; accept: Record<string, string[]> }[];
 }
 

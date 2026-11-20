@@ -6,12 +6,11 @@ import './components/dr-haupt';
 import {app, byId, Detect} from './state';
 import {setzeAnzahl, setzePunkte, leereTabelle, zaehlerGeaendert, tabelleZeilenGeaendert, ZAEHLER_ID, TABELLE_ID, START_Y, START_Z} from './punkte';
 import {rechnen, zeichne2D} from './rechnen';
-import {initDateien} from './dateien';
+import {initDateien, verwerfenBestaetigt, setzeDateiname, gespeichertenStandInitialisieren} from './dateien';
 import {initAutosave} from './autosave';
 import {starteVersionspruefung} from './sw_update';
 import {initEinstellungen} from './einstellungen';
 import {enableTouchHints} from './components/touch_hint';
-import {confirmdialog} from './components/confirm_dialog';
 
 // dunkles Theme von Shoelace über die Klasse sl-theme-dark (wie d2beam-gui)
 const dunkel = window.matchMedia('(prefers-color-scheme: dark)');
@@ -37,11 +36,12 @@ function geraeteInfo(): void {
 }
 
 async function neueEingabe(): Promise<void> {
-    if (!await confirmdialog('ja', 'nein', 'Neue Eingabe beginnen? Die aktuelle Eingabe wird gelöscht.')) return;
+    // wie d2beam-gui: Rückfrage nur, wenn Änderungen noch nicht in einer Datei gespeichert sind
+    if (!await verwerfenBestaetigt(true)) return;
     for (const id of ['N_kraft', 'My', 'Mz']) byId<HTMLInputElement>(id).value = '';
     setzeAnzahl(4);
     leereTabelle();
-    byId('id_dateiname').textContent = '';
+    setzeDateiname('');
 }
 
 async function start(): Promise<void> {
@@ -90,6 +90,7 @@ async function start(): Promise<void> {
 
     // letzte Eingabe wiederherstellen und künftig automatisch sichern
     initAutosave();
+    gespeichertenStandInitialisieren();
 
     // Service Worker registrieren und auf neue Versionen prüfen (auch beim Zurückkehren aus dem Hintergrund)
     starteVersionspruefung();

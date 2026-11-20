@@ -159,6 +159,9 @@ export class DrHaupt extends LitElement {
             <li><b>3D:</b> Spannungskörper. Maus: ziehen dreht, rechte Taste verschiebt, Rad zoomt,
               überfahren zeigt Werte. Finger: Button links unten schaltet um zwischen Verschieben und
               Werteanzeige, zwei Finger drehen und zoomen.</li>
+            <li><b>Dateien:</b> Speichern als <i>.polyquer</i> (auf Android <i>.polyquer.json</i>), Einlesen über den
+              Button oder durch Ablegen der Datei im Tab Eingabe (Drag &amp; Drop). Gefragt wird nur, wenn Änderungen
+              noch nicht gespeichert sind.</li>
             <li>Die Eingabe wird im Browser gespeichert und beim nächsten Start wiederhergestellt.</li>
           </ul>
           <h4>Gerät</h4>

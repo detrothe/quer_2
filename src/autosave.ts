@@ -1,5 +1,5 @@
 import {app} from './state';
-import {eingabeAlsJSON, eingabeEinlesen} from './dateien';
+import {eingabeAlsJSON, eingabeEinlesen, dateiname, setzeDateiname} from './dateien';
 import {rechnen} from './rechnen';
 import {alertdialog} from './components/confirm_dialog';
 
@@ -18,12 +18,13 @@ const SCHLUESSEL_DEFEKT = 'current_input_POLYQUER_defekt';
 interface Sicherung {
     eingabe: string;     // JSON wie in der Datei
     gerechnet: boolean;  // war beim Sichern ein Ergebnis zu sehen?
+    dateiname?: string;  // zuletzt geöffnete/gespeicherte Datei
 }
 
 /** Aktuelle Eingabe sofort sichern (auch vor dem Neuladen nach einem Update, siehe sw_update.ts). */
 export function sichern(): void {
     try {
-        const daten: Sicherung = {eingabe: eingabeAlsJSON(), gerechnet: app.gerechnet};
+        const daten: Sicherung = {eingabe: eingabeAlsJSON(), gerechnet: app.gerechnet, dateiname: dateiname()};
         window.localStorage.setItem(SCHLUESSEL, JSON.stringify(daten));
     } catch (e) {
         console.error('autosave: Sichern nicht möglich', e);
@@ -43,6 +44,7 @@ function wiederherstellen(): void {
     try {
         const daten = JSON.parse(text) as Sicherung;
         if (!eingabeEinlesen(daten.eingabe)) throw new Error('gespeicherte Eingabe wurde abgelehnt');
+        setzeDateiname(daten.dateiname ?? '');
         if (daten.gerechnet) rechnen(false);
     } catch (error) {
         // Defekte/inkompatible Sicherung: aufheben, löschen und mit der Starteingabe weitermachen,

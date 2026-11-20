@@ -17,7 +17,9 @@ funktioniert danach auch offline. Bedienung mit Maus, Stift oder Finger.
   zoombar; Werte der Pfeilspitzen unter dem Cursor; Export als PNG in hoher Auflösung
 - Punkte-Tabelle mit Zeilen einfügen/löschen, Rückgängig/Wiederherstellen und Kontextmenü
   (Kopieren, Hochzählen, Zwischenablage)
-- Eingabe speichern und einlesen; die letzte Eingabe wird im Browser gesichert und beim nächsten
+- Eingabe speichern und einlesen (Dateiendung `.polyquer`, auf Android `.polyquer.json`; ältere
+  `.txt`-Dateien lassen sich weiter einlesen), Öffnen auch per Drag & Drop; Rückfrage nur bei noch
+  nicht gespeicherten Änderungen. Die letzte Eingabe wird im Browser gesichert und beim nächsten
   Start wiederhergestellt
 - Farben der Tabellen und Akzentfarbe einstellbar, helles und dunkles Design
 
