@@ -1,5 +1,6 @@
 import {app, byId} from './state';
 import {leseRohwerte, setzePunkte, MIN_PUNKTE} from './punkte';
+import {alertdialog} from './components/confirm_dialog';
 
 /**
  * Dateiformat (JSON). Y und Z werden wie bisher als Objekt {"0": .., "1": ..} gespeichert
@@ -77,7 +78,7 @@ function handleFileSelect_read(): void {
             if (eingabeEinlesen(String(reader.result))) {
                 byId('id_dateiname').textContent = file.name;
             } else {
-                alert('Die Datei enthält keine gültigen Querschnittsdaten.');
+                void alertdialog('ok', 'Die Datei enthält keine gültigen Querschnittsdaten.');
             }
         };
         reader.readAsText(file);
@@ -112,7 +113,7 @@ async function handleFileSelect_save(): Promise<void> {
         } catch (error) {
             // Abbruch im Dateidialog ist kein Fehler
             if (error instanceof DOMException && error.name === 'AbortError') return;
-            alert(error instanceof Error ? error.message : String(error));
+            void alertdialog('ok', error instanceof Error ? error.message : String(error));
         }
     } else {
         const filename = window.prompt('Name der Datei mit Extension, z.B. test.txt\nDie Datei wird im Default Download Ordner gespeichert');

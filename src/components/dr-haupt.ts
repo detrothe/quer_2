@@ -82,12 +82,16 @@ export class DrHaupt extends LitElement {
           <p class="hinweis">Punkte gegen den Uhrzeigersinn eingeben (so wie in der Grafik mit y&#772; nach links und
             z&#772; nach unten dargestellt). Löcher über einen Schlitz (hin und zurück auf derselben Kante);
             die Punkte des Lochrands sind dabei im Uhrzeigersinn einzugeben.
-            Rechte Maustaste bzw. langes Drücken auf markierte Zellen öffnet das Kontextmenü.</p>
+            Rechte Maustaste bzw. langes Drücken auf markierte Zellen öffnet das Kontextmenü.
+            In der Spalte No fügt <b>+</b> oberhalb eine Zeile ein, der Papierkorb löscht die Zeile
+            (beides mit Rückgängig/Wiederherstellen).</p>
           <div class="zeile">
             <dr-button-pm id="${ZAEHLER_ID}" txt="Anzahl Punkte: " inputid="npkte" .nel="${START_Y.length}" .minValue="${3}"></dr-button-pm>
           </div>
           <dr-tabelle
             id="${TABELLE_ID}"
+            allow_delete_row
+            allow_insert_row
             nzeilen="${START_Y.length}"
             nspalten="2"
             columns='["No", "y&#772; [cm]", "z&#772; [cm]"]'

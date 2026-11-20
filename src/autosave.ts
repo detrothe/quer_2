@@ -1,6 +1,7 @@
 import {app} from './state';
 import {eingabeAlsJSON, eingabeEinlesen} from './dateien';
 import {rechnen} from './rechnen';
+import {alertdialog} from './components/confirm_dialog';
 
 /*
  * Eingabe automatisch sichern und wiederherstellen (wie in d2beam-gui).
@@ -50,7 +51,7 @@ function wiederherstellen(): void {
             window.localStorage.setItem(SCHLUESSEL_DEFEKT, text);
             window.localStorage.removeItem(SCHLUESSEL);
         } catch { /* nichts mehr zu retten */ }
-        alert('Die zuletzt gespeicherte Eingabe konnte nicht gelesen werden. Es wird mit der Beispieleingabe gestartet.');
+        void alertdialog('ok', 'Die zuletzt gespeicherte Eingabe konnte nicht gelesen werden. Es wird mit der Beispieleingabe gestartet.');
     }
 }
 

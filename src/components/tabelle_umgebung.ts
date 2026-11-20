@@ -43,15 +43,5 @@ export function str(strings: TemplateStringsArray, ...werte: unknown[]): string 
     return strings.reduce((s, teil, i) => s + teil + (i < werte.length ? String(werte[i]) : ''), '');
 }
 
-// --- pages/confirm_dialog: nur für allow_delete_row nötig (in quer_2 nicht genutzt)
-export class ConfirmDialog {
-    private frage: string;
-
-    constructor({question_Text}: { question_Text?: string; trueButton_Text?: string; falseButton_Text?: string }) {
-        this.frage = question_Text ?? 'Sind Sie sicher?';
-    }
-
-    confirm(): Promise<boolean> {
-        return Promise.resolve(window.confirm(this.frage));
-    }
-}
+// --- pages/confirm_dialog: unverändert aus d2beam-gui übernommen
+export {ConfirmDialog} from './confirm_dialog';

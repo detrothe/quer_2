@@ -4,11 +4,12 @@ import '@shoelace-style/shoelace/dist/themes/dark.css';
 
 import './components/dr-haupt';
 import {app, byId, Detect} from './state';
-import {setzeAnzahl, setzePunkte, leereTabelle, zaehlerGeaendert, ZAEHLER_ID, START_Y, START_Z} from './punkte';
+import {setzeAnzahl, setzePunkte, leereTabelle, zaehlerGeaendert, tabelleZeilenGeaendert, ZAEHLER_ID, TABELLE_ID, START_Y, START_Z} from './punkte';
 import {rechnen, zeichne2D} from './rechnen';
 import {initDateien} from './dateien';
 import {initAutosave} from './autosave';
 import {initEinstellungen} from './einstellungen';
+import {confirmdialog} from './components/confirm_dialog';
 
 // dunkles Theme von Shoelace über die Klasse sl-theme-dark (wie d2beam-gui)
 const dunkel = window.matchMedia('(prefers-color-scheme: dark)');
@@ -33,8 +34,8 @@ function geraeteInfo(): void {
     });
 }
 
-function neueEingabe(): void {
-    if (!confirm('Neue Eingabe beginnen? Die aktuelle Eingabe wird gelöscht.')) return;
+async function neueEingabe(): Promise<void> {
+    if (!await confirmdialog('ja', 'nein', 'Neue Eingabe beginnen? Die aktuelle Eingabe wird gelöscht.')) return;
     for (const id of ['N_kraft', 'My', 'Mz']) byId<HTMLInputElement>(id).value = '';
     setzeAnzahl(4);
     leereTabelle();
@@ -49,8 +50,9 @@ async function start(): Promise<void> {
     setzePunkte(START_Y, START_Z);
 
     byId('rechnen').addEventListener('click', () => rechnen());
-    byId('neueEingabe').addEventListener('click', neueEingabe);
+    byId('neueEingabe').addEventListener('click', () => void neueEingabe());
     byId(ZAEHLER_ID).addEventListener('change', zaehlerGeaendert);
+    byId(TABELLE_ID).addEventListener('rows-changed', tabelleZeilenGeaendert);
     initDateien();
     initEinstellungen();
     geraeteInfo();

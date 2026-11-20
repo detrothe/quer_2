@@ -42,6 +42,15 @@ export function setzeAnzahl(n: number): void {
     tabelleElement().setAttribute('nzeilen', String(n));
 }
 
+/** dr-tabelle hat selbst Zeilen gelöscht/eingefügt/wiederhergestellt → Zähler nachziehen (wie d2beam-gui). */
+export function tabelleZeilenGeaendert(ev: Event): void {
+    const n = (ev as CustomEvent).detail.value;
+    byId<drButtonPM>(ZAEHLER_ID).setValue(n);
+    // Attribut nachziehen: sonst bliebe dort die alte Zahl stehen, und ein späteres Setzen auf genau
+    // diesen Wert über den Zähler würde kein attributeChangedCallback (und keine Größenänderung) auslösen
+    tabelleElement().setAttribute('nzeilen', String(n));
+}
+
 /** Zähler wurde geändert → Tabelle anpassen. */
 export function zaehlerGeaendert(): void {
     const n = byId<drButtonPM>(ZAEHLER_ID).getValue();
@@ -93,6 +102,8 @@ export function setzePunkte(y: ArrayLike<number | string | null>, z: ArrayLike<n
         zelle(i + 1, 1).value = y[i] === null ? '' : String(y[i]);
         zelle(i + 1, 2).value = z[i] === null ? '' : String(z[i]);
     }
+    // neue Eingabe (Datei, Wiederherstellen): altes Undo/Redo passt nicht mehr
+    (tabelleElement() as HTMLElement & { clear_undo?: () => void }).clear_undo?.();
 }
 
 /** Alle Koordinaten löschen (Zeilenzahl bleibt). */

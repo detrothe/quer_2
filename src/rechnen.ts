@@ -3,6 +3,7 @@ import {lesePunkte, MIN_PUNKTE} from './punkte';
 import {CQuer_polygon} from './calc/quer1';
 import {sigmaFunktion, SigmaFunktion} from './calc/spannung';
 import {zeichneQuerschnitt, Eingabepunkte} from './grafik';
+import {alertdialog} from './components/confirm_dialog';
 
 /** Ergebnis der letzten Berechnung (für das Neuzeichnen beim Tab-Wechsel). */
 let letztes: { quer: CQuer_polygon; sigma: SigmaFunktion; eingabe: Eingabepunkte } | null = null;
@@ -49,14 +50,14 @@ export function zeichne2D(): void {
 export function rechnen(zeigeErgebnisse = true): void {
     const {y, z, fehler} = lesePunkte();
     if (y.length < MIN_PUNKTE) {
-        alert(`Es werden mindestens ${MIN_PUNKTE} Punkte benötigt.`);
+        void alertdialog('ok', `Es werden mindestens ${MIN_PUNKTE} Punkte benötigt.`);
         return;
     }
 
     let quer = new CQuer_polygon(y, z);
     quer.calc();
     if (!(Math.abs(quer.area) > 0)) {
-        alert('Die Querschnittsfläche ist null – bitte die Koordinaten prüfen.');
+        void alertdialog('ok', 'Die Querschnittsfläche ist null – bitte die Koordinaten prüfen.');
         return;
     }
     // Im Uhrzeigersinn eingegeben → Fläche negativ und alle Vorzeichen falsch: Reihenfolge umkehren
@@ -84,6 +85,6 @@ export function rechnen(zeigeErgebnisse = true): void {
     import('./grafik3d').then(m => m.zeichne3D(quer, sigma));
 
     if (fehler > 0) {
-        alert(`${fehler} ungültige Eingabe(n) in der Tabelle (rot markiert) wurden als 0 gerechnet.`);
+        void alertdialog('ok', `${fehler} ungültige Eingabe(n) in der Tabelle (rot markiert) wurden als 0 gerechnet.`);
     }
 }

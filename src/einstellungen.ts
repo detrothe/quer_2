@@ -11,6 +11,7 @@
 
 import '@shoelace-style/shoelace/dist/components/color-picker/color-picker.js';
 import {byId} from './state';
+import {alertdialog} from './components/confirm_dialog';
 
 const STANDARD_TABELLE = '#cfd915';   // wie d2beam-gui
 const STANDARD_AKZENT = '#0284c7';    // Shoelace sky-600
@@ -79,7 +80,7 @@ function speichern(): void {
         else window.localStorage.removeItem(KEY_AKZENT);
         geaendert(false);
     } catch (e) {
-        alert('Speichern im Browser nicht möglich: ' + (e instanceof Error ? e.message : String(e)));
+        void alertdialog('ok', 'Speichern im Browser nicht möglich: ' + (e instanceof Error ? e.message : String(e)));
     }
 }
 
