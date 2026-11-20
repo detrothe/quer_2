@@ -20,7 +20,9 @@ export default defineConfig({
                 scope: './',
                 display: 'standalone',
                 background_color: '#ffffff',
-                theme_color: '#800080',
+                // keine Themenfarbe: Browser-/Statusleiste behält die Standardfarbe des Browsers.
+                // Ausdrücklich undefined, sonst setzt vite-plugin-pwa ihr Standardgrün #42b883 ein.
+                theme_color: undefined,
                 icons: [
                     {
                         src: 'polyquer.png',
