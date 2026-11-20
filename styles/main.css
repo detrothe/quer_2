@@ -586,15 +586,16 @@ sl-color-picker::part(trigger) {
     --title-text-color: var(--table_fg, #000000);
 }
 
+/* rechts unten, damit es auf dem Smartphone nicht mit dem Controls-Panel überlappt;
+   ohne Hintergrund und durchlässig für Zeiger, damit es die Bedienung der Ansicht nicht stört */
 #view3d-info {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    bottom: 1rem;
+    right: 0.75rem;
     z-index: 2;
-    padding: 8px 10px;
-    background-color: rgba(255, 255, 255, 0.75);
-    border-radius: 4px;
+    text-align: right;
     line-height: 1.6;
+    pointer-events: none;
 }
 
 .view3d-cursor {
