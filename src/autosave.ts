@@ -20,7 +20,8 @@ interface Sicherung {
     gerechnet: boolean;  // war beim Sichern ein Ergebnis zu sehen?
 }
 
-function sichern(): void {
+/** Aktuelle Eingabe sofort sichern (auch vor dem Neuladen nach einem Update, siehe sw_update.ts). */
+export function sichern(): void {
     try {
         const daten: Sicherung = {eingabe: eingabeAlsJSON(), gerechnet: app.gerechnet};
         window.localStorage.setItem(SCHLUESSEL, JSON.stringify(daten));

@@ -11,8 +11,10 @@ export default defineConfig({
     define: {__APP_VERSION__: JSON.stringify(pkg.version)},
     plugins: [
         VitePWA({
-            registerType: 'autoUpdate',
-            injectRegister: 'auto',
+            // wie d2beam-gui: neue Version im Hintergrund laden, übernehmen erst nach Rückfrage
+            // (Registrierung und Prüfung in src/sw_update.ts)
+            registerType: 'prompt',
+            injectRegister: false,
             includeAssets: ['favicon-48.png', 'apple-touch-icon.png'],
             // Manifest-Icons nicht zusätzlich vorab cachen (die 512er braucht nur die Installation)
             includeManifestIcons: false,
@@ -39,6 +41,8 @@ export default defineConfig({
                 globPatterns: ['**/*.{js,css,html,png,woff2}'],
                 // große Icons braucht nur die Installation, nicht der Offline-Betrieb
                 globIgnores: ['**/512x512.png', '**/maskable_512.png'],
+                cleanupOutdatedCaches: true,
+                clientsClaim: true,
             },
         }),
     ],

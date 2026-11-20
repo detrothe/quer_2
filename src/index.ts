@@ -8,6 +8,7 @@ import {setzeAnzahl, setzePunkte, leereTabelle, zaehlerGeaendert, tabelleZeilenG
 import {rechnen, zeichne2D} from './rechnen';
 import {initDateien} from './dateien';
 import {initAutosave} from './autosave';
+import {starteVersionspruefung} from './sw_update';
 import {initEinstellungen} from './einstellungen';
 import {enableTouchHints} from './components/touch_hint';
 import {confirmdialog} from './components/confirm_dialog';
@@ -89,6 +90,9 @@ async function start(): Promise<void> {
 
     // letzte Eingabe wiederherstellen und künftig automatisch sichern
     initAutosave();
+
+    // Service Worker registrieren und auf neue Versionen prüfen (auch beim Zurückkehren aus dem Hintergrund)
+    starteVersionspruefung();
 }
 
 void start();
