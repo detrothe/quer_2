@@ -181,6 +181,18 @@ hr {
     color: red;
 }
 
+/* Zahlenfelder (type=number, step=any wie d2beam-gui): ohne Pfeile zum Hoch-/Runterzählen */
+.input_tab[type='number']::-webkit-inner-spin-button,
+.input_tab[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.input_tab[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
 .zeile {
     display: flex;
     flex-wrap: wrap;

@@ -73,9 +73,9 @@ export class DrHaupt extends LitElement {
 
           <h3>Schnittgrößen</h3>
           <table class="schnittgroessen">
-            <tr><td>N</td><td><input type="text" id="N_kraft" class="input_tab" inputmode="decimal" pattern="[0-9.,eE+\\-]*"></td><td>kN</td></tr>
-            <tr><td>M<sub>y</sub></td><td><input type="text" id="My" class="input_tab" inputmode="decimal" pattern="[0-9.,eE+\\-]*"></td><td>kNm</td></tr>
-            <tr><td>M<sub>z</sub></td><td><input type="text" id="Mz" class="input_tab" inputmode="decimal" pattern="[0-9.,eE+\\-]*"></td><td>kNm</td></tr>
+            <tr><td>N</td><td><input type="number" step="any" id="N_kraft" class="input_tab" pattern="[0-9.,eE+-]*"></td><td>kN</td></tr>
+            <tr><td>M<sub>y</sub></td><td><input type="number" step="any" id="My" class="input_tab" pattern="[0-9.,eE+-]*"></td><td>kNm</td></tr>
+            <tr><td>M<sub>z</sub></td><td><input type="number" step="any" id="Mz" class="input_tab" pattern="[0-9.,eE+-]*"></td><td>kNm</td></tr>
           </table>
 
           <h3>Polygonpunkte</h3>
