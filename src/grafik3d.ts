@@ -42,13 +42,19 @@ const optionen = {
     achsen: true,
     skalierung: 1,
     fangweite: 20,   // Pixel
-    zweiFinger: 'drehen + zoomen',
 };
 
-const ZWEI_FINGER: Record<string, THREE.TOUCH> = {
-    'drehen + zoomen': THREE.TOUCH.DOLLY_ROTATE,
-    'verschieben + zoomen': THREE.TOUCH.DOLLY_PAN,
-};
+/*
+ * Fingerbedienung wie in d2beam-gui (Tab Ergebnisse): Ein Button links unten schaltet um,
+ * was ein Finger tut – verschieben (Pan) oder Werte am Fangkreuz anzeigen („123“).
+ * Zwei Finger drehen und zoomen immer.
+ */
+let panModus = true;
+
+const ICON_PAN = `<svg width="1rem" height="1rem" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+<path fill="#ffffff" d="M16 8l-3-3v2h-4v-4h2l-3-3-3 3h2v4h-4v-2l-3 3 3 3v-2h4v4h-2l3 3 3-3h-2v-4h4v2z"></path></svg>`;
+const ICON_WERTE = `<svg width="1rem" height="1rem" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+<text x="0" y="12" fill="#ffffff" style="font: bold 0.6rem sans-serif">123</text></svg>`;
 
 let renderer: THREE.WebGLRenderer;
 let labelRenderer: CSS2DRenderer;
@@ -177,7 +183,8 @@ function init(): void {
 
     controls = new OrbitControls(camera, renderer.domElement);
     // Ein Finger: Werte abfragen (keine Kamerabewegung), zwei Finger: drehen und zoomen
-    controls.touches = {ONE: null, TWO: ZWEI_FINGER[optionen.zweiFinger]};
+    controls.touches = {ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE};
+    initPanButton();
     // OrbitControls setzt beim Start style.cursor = 'auto' – der Mauspfeil wird durch das Fangkreuz ersetzt
     renderer.domElement.style.cursor = 'none';
     controls.addEventListener('change', () => {
@@ -211,9 +218,6 @@ function init(): void {
     gui.add(optionen, 'innenPfeile').name('innere Pfeile').onChange(sichtbarkeit);
     gui.add(optionen, 'skalierungPfeile', 0.2, 3, 0.1).name('Skalierung Pfeile').onChange(neuAufbauen);
     gui.add(optionen, 'achsen').name('Achsen anzeigen').onChange(sichtbarkeit);
-    gui.add(optionen, 'zweiFinger', Object.keys(ZWEI_FINGER)).name('2 Finger').onChange(() => {
-        controls.touches.TWO = ZWEI_FINGER[optionen.zweiFinger];
-    });
     gui.add(optionen, 'fangweite', 5, 60, 1).name('Fangweite [px]').onChange(() => {
         if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y);
     });
@@ -484,8 +488,32 @@ function cursorAusblenden(): void {
     }
 }
 
+/** Button links unten: ein Finger verschiebt (Pan) oder fragt Werte ab (123). Nur auf Touch-Geräten. */
+function initPanButton(): void {
+    if (navigator.maxTouchPoints === 0) return;   // nur Maus: kein Umschalten nötig
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.id = 'view3d-pan';
+    const aktualisieren = () => {
+        btn.innerHTML = panModus ? ICON_PAN : ICON_WERTE;
+        btn.title = panModus
+            ? 'Ein Finger verschiebt – tippen für Werteanzeige'
+            : 'Ein Finger zeigt Werte – tippen zum Verschieben';
+        controls.touches.ONE = panModus ? THREE.TOUCH.PAN : null;
+        if (panModus) cursorAusblenden();
+    };
+    btn.addEventListener('click', () => {
+        panModus = !panModus;
+        aktualisieren();
+    });
+    aktualisieren();
+    byId('view3d').appendChild(btn);
+}
+
 function zeigerBewegt(ev: PointerEvent): void {
     if (!aktQuer) return;
+    if (ev.pointerType === 'touch' && panModus) return;   // Finger verschiebt, keine Werteabfrage
     let x = ev.offsetX;
     let y = ev.offsetY;
     if (ev.pointerType === 'touch') {
