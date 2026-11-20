@@ -22,3 +22,6 @@ interface Window {
 
 /** Versionsnummer aus package.json (vite.config.ts, define) */
 declare const __APP_VERSION__: string;
+
+/** Build-Datum TT.MM.JJJJ (vite.config.ts, define) */
+declare const __BUILD_DATE__: string;

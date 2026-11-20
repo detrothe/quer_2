@@ -7,8 +7,13 @@ export default defineConfig({
     base: './',
     // three.js ist als eigener, nachgeladener Chunk bewusst groß
     build: {chunkSizeWarningLimit: 800},
-    // Versionsnummer für den Tab Info
-    define: {__APP_VERSION__: JSON.stringify(pkg.version)},
+    // Versionsnummer und Build-Datum für den Tab Info
+    define: {
+        __APP_VERSION__: JSON.stringify(pkg.version),
+        __BUILD_DATE__: JSON.stringify(new Date().toLocaleDateString('de-DE', {
+            day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Berlin',
+        })),
+    },
     plugins: [
         VitePWA({
             // wie d2beam-gui: neue Version im Hintergrund laden, übernehmen erst nach Rückfrage

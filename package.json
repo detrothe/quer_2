@@ -1,6 +1,6 @@
 {
   "name": "quer_2",
-  "version": "0.6.0",
+  "version": "1.0.0",
   "description": "Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts",
   "scripts": {
     "dev": "vite --open",

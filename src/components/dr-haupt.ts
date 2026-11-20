@@ -143,7 +143,6 @@ export class DrHaupt extends LitElement {
         <!------------------------------------------------------------------------------------ Info -->
         <sl-tab-panel name="info">
           <h3>Querschnittswerte und Spannungen eines polygonal begrenzten Querschnitts</h3>
-          <p>Version ${__APP_VERSION__}</p>
           <p>
             Berechnet Schwerpunkt, Fläche, Flächenmomente 2. Grades, Hauptträgheitsmomente und die
             Normalspannungen aus Längskraft N und Biegemomenten M<sub>y</sub>, M<sub>z</sub>.
@@ -167,7 +166,7 @@ export class DrHaupt extends LitElement {
           <h4>Gerät</h4>
           <p id="infoBox"></p>
           <p class="footer">
-            20.11.2026 <a href="https://statikverstehen.de">&#169; statikverstehen.de</a>
+            Version ${__APP_VERSION__} &middot; ${__BUILD_DATE__} <a href="https://statikverstehen.de">&#169; statikverstehen.de</a>
           </p>
         </sl-tab-panel>
 
