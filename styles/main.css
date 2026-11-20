@@ -67,6 +67,29 @@ dr-haupt {
     height: 100dvh;
 }
 
+/*
+  Installierte PWA auf iPhone/iPad (wie d2beam-gui, global.css; @supports -webkit-touch-callout gibt es nur
+  bei WebKit auf iOS/iPadOS): iPadOS 26/27 legt oben einen grauen Schleier über die Seite, der sich von der
+  Seite aus nicht abschalten lässt. Inhalt deshalb etwas nach unten rücken, damit die Tab-Leiste lesbar bleibt.
+*/
+@supports (-webkit-touch-callout: none) {
+    @media (display-mode: standalone) {
+        :root {
+            /* Tab-Beschriftung sitzt 1rem (Innenabstand der Tabs) unter dem Rand. Bei kleiner Schrift
+               rutscht sie höher -> Abstand so wählen, dass Text immer mind. 14px + 16px tief liegt */
+            --pwa-abstand-oben: max(14px, calc(30px - 1rem));
+        }
+
+        body {
+            padding-top: var(--pwa-abstand-oben);
+        }
+
+        dr-haupt {
+            height: calc(100dvh - var(--pwa-abstand-oben));
+        }
+    }
+}
+
 /*----------------------------------------------------------------------------------------- Tabs */
 
 sl-tab-group {
@@ -272,7 +295,7 @@ table.werte td.zahl,
     position: relative;
     flex: 1 1 22rem;
     min-width: 18rem;
-    height: calc(100dvh - 5rem);
+    height: calc(100dvh - 5rem - var(--pwa-abstand-oben, 0px));
     min-height: 20rem;
     background-color: var(--grafik-hintergrund);
     border-radius: 6px;
