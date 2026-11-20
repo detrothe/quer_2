@@ -49,7 +49,7 @@ const optionen = {
  * was ein Finger tut – verschieben (Pan) oder Werte am Fangkreuz anzeigen („123“).
  * Zwei Finger drehen und zoomen immer.
  */
-let panModus = true;
+let panModus = false;   // Standard: Werte anzeigen (der Button wird von neuen Anwendern leicht übersehen)
 
 const ICON_PAN = `<svg width="1rem" height="1rem" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
 <path fill="currentColor" d="M16 8l-3-3v2h-4v-4h2l-3-3-3 3h2v4h-4v-2l-3 3 3 3v-2h4v4h-2l3 3 3-3h-2v-4h4v2z"></path></svg>`;

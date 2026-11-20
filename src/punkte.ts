@@ -51,10 +51,13 @@ export function tabelleZeilenGeaendert(ev: Event): void {
     tabelleElement().setAttribute('nzeilen', String(n));
 }
 
-/** Zähler wurde geändert → Tabelle anpassen. */
+/**
+ * Zähler wurde geändert → Tabelle anpassen, mit Rückgängig (beim Verkleinern über „−“ landen die
+ * entfernten Zeilen wie beim Papierkorb im Rückgängig-Speicher).
+ */
 export function zaehlerGeaendert(): void {
-    const n = byId<drButtonPM>(ZAEHLER_ID).getValue();
-    tabelleElement().setAttribute('nzeilen', String(Math.max(MIN_PUNKTE, n)));
+    const n = Math.max(MIN_PUNKTE, byId<drButtonPM>(ZAEHLER_ID).getValue());
+    (tabelleElement() as HTMLElement & { set_nzeilen_undo(n: number): void }).set_nzeilen_undo(n);
 }
 
 export interface Punkte {
