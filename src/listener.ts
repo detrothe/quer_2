@@ -46,7 +46,7 @@ export function resize_polyTabelle(): void {
     }
 }
 
-function rechnen(): void {
+export function rechnen(): void {
     updateSvgWidth();
 
     const tbody = polyTable().tBodies[0];
@@ -87,6 +87,7 @@ function rechnen(): void {
     for (const [id, wert] of ausgabe) byId(id).innerText = wert.toFixed(2);
 
     zeichneQuerschnitt(quer);
+    app.gerechnet = true;
 
     // three.js erst bei Bedarf laden (eigener Chunk, hält den Start schnell)
     import('./grafik3d').then(m => m.zeichne3D(quer, sigma));

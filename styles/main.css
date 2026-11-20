@@ -255,6 +255,11 @@ button[type=button]:hover {
 #view3d {
     position: relative;
     display: none;
+    /* Gesten gehören der 3D-Ansicht, auch über Info-Feld und Controls (sonst zoomt der Browser die Seite) */
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+    overscroll-behavior: contain;
     height: 1000px;
     background-color: #dddddd;
     overflow: hidden;
@@ -395,6 +400,11 @@ button[type=button]:hover {
     #open3d {
         display: none;
     }
+}
+
+html.view3d-offen,
+html.view3d-offen body {
+    overflow: hidden;
 }
 
 @media (max-width: 1499px) {

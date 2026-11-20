@@ -42,6 +42,12 @@ const optionen = {
     achsen: true,
     skalierung: 1,
     fangweite: 20,   // Pixel
+    zweiFinger: 'drehen + zoomen',
+};
+
+const ZWEI_FINGER: Record<string, THREE.TOUCH> = {
+    'drehen + zoomen': THREE.TOUCH.DOLLY_ROTATE,
+    'verschieben + zoomen': THREE.TOUCH.DOLLY_PAN,
 };
 
 let renderer: THREE.WebGLRenderer;
@@ -67,6 +73,7 @@ let innenPunkte: Punkt[] = [];   // Fußpunkte der inneren Pfeile (Raster)
 let groesse = 1;          // charakteristische Abmessung des Querschnitts
 let hoehenFaktor = 1;     // Z = σ · hoehenFaktor
 let kameraGroesse = 0;    // Größe, für die die Kamera zuletzt eingestellt wurde
+let kameraNachholen = false;   // Kamera konnte nicht eingestellt werden, weil die Ansicht ausgeblendet war
 
 // Cursor (Fangkreuz) und Wertanzeige
 let cursorSvg: SVGSVGElement;
@@ -100,14 +107,29 @@ function resize(): void {
     labelRenderer.setSize(w, h);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
+    if (kameraNachholen) kameraZuruecksetzen();
     render();
     if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y);   // Kreuz bleibt auf der Pfeilspitze
 }
 
+/**
+ * Kamera schräg von vorn auf den Querschnitt richten. Der Abstand wird so gewählt, dass das Modell
+ * (Querschnitt + Spannungskörper) sowohl in der Höhe als auch in der Breite ins Bild passt –
+ * wichtig für Smartphones im Hochformat, wo der horizontale Blickwinkel klein ist.
+ */
 function kameraZuruecksetzen(): void {
+    if (host.clientWidth === 0 || host.clientHeight === 0) {
+        kameraNachholen = true;   // erst beim Einblenden möglich (Seitenverhältnis unbekannt)
+        return;
+    }
+    kameraNachholen = false;
     kameraGroesse = groesse;
-    const d = groesse * 3.2;
-    camera.position.set(d * 0.55, d * 0.35, d * 0.9);
+
+    const radius = groesse * 1.0;    // umschließende Kugel: halbe Diagonale + Spannungshöhe, mit Rand
+    const fovV = THREE.MathUtils.degToRad(camera.fov);
+    const fovH = 2 * Math.atan(Math.tan(fovV / 2) * camera.aspect);
+    const d = radius / Math.sin(Math.min(fovV, fovH) / 2);
+    camera.position.set(0.5, 0.32, 0.8).normalize().multiplyScalar(d);
     camera.near = groesse / 100;
     camera.far = groesse * 100;
     camera.updateProjectionMatrix();
@@ -155,7 +177,7 @@ function init(): void {
 
     controls = new OrbitControls(camera, renderer.domElement);
     // Ein Finger: Werte abfragen (keine Kamerabewegung), zwei Finger: drehen und zoomen
-    controls.touches = {ONE: null, TWO: THREE.TOUCH.DOLLY_ROTATE};
+    controls.touches = {ONE: null, TWO: ZWEI_FINGER[optionen.zweiFinger]};
     // OrbitControls setzt beim Start style.cursor = 'auto' – der Mauspfeil wird durch das Fangkreuz ersetzt
     renderer.domElement.style.cursor = 'none';
     controls.addEventListener('change', () => {
@@ -189,6 +211,9 @@ function init(): void {
     gui.add(optionen, 'innenPfeile').name('innere Pfeile').onChange(sichtbarkeit);
     gui.add(optionen, 'skalierungPfeile', 0.2, 3, 0.1).name('Skalierung Pfeile').onChange(neuAufbauen);
     gui.add(optionen, 'achsen').name('Achsen anzeigen').onChange(sichtbarkeit);
+    gui.add(optionen, 'zweiFinger', Object.keys(ZWEI_FINGER)).name('2 Finger').onChange(() => {
+        controls.touches.TWO = ZWEI_FINGER[optionen.zweiFinger];
+    });
     gui.add(optionen, 'fangweite', 5, 60, 1).name('Fangweite [px]').onChange(() => {
         if (letzterZeiger) fangen(letzterZeiger.x, letzterZeiger.y);
     });
@@ -535,6 +560,13 @@ function fangen(x: number, y: number): void {
 }
 
 //----------------------------------------------------------------------------------------------------------------------
+
+/** Nach Rückkehr aus dem Hintergrund neu zeichnen (Größe und WebGL-Kontext können sich geändert haben). */
+export function neuZeichnen(): void {
+    if (!renderer) return;
+    resize();
+    render();
+}
 
 /** 3D-Ansicht für den berechneten Querschnitt neu aufbauen. */
 export function zeichne3D(quer: CQuer_polygon, sigma: SigmaFunktion): void {

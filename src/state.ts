@@ -51,6 +51,7 @@ export const app = {
     hasFSAccess: 'showSaveFilePicker' in window,
     isMac: navigator.userAgent.includes('Mac OS X'),
     npkte: 0,
+    gerechnet: false,   // wurde schon gerechnet? (für das Wiederherstellen nach Hintergrund/Neustart)
 };
 
 export const Detect = new DetectOS();

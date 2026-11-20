@@ -5,6 +5,7 @@ import {createPolyTable, initTouchOverlay} from './tabelle';
 import {initButtons} from './listener';
 import {initDateien} from './dateien';
 import {init_contextmenu} from './contextMenu';
+import {initAutosave} from './autosave';
 
 updateSvgWidth();
 
@@ -19,13 +20,23 @@ init_contextmenu();
 initButtons();
 initDateien();
 
-// 3D-Ansicht auf schmalen Bildschirmen als Vollbild ein-/ausblenden
-byId('open3d').addEventListener('click', () => byId('view3d').classList.add('offen'));
-byId('close3d').addEventListener('click', () => byId('view3d').classList.remove('offen'));
+// 3D-Ansicht auf schmalen Bildschirmen als Vollbild ein-/ausblenden.
+// Solange sie offen ist, darf die Seite dahinter weder scrollen noch zoomen.
+byId('open3d').addEventListener('click', () => {
+    byId('view3d').classList.add('offen');
+    document.documentElement.classList.add('view3d-offen');
+});
+byId('close3d').addEventListener('click', () => {
+    byId('view3d').classList.remove('offen');
+    document.documentElement.classList.remove('view3d-offen');
+});
 
 byId<HTMLInputElement>('input_pkte').value = '10';
 createPolyTable();
 initTouchOverlay();
+
+// letzte Eingabe wiederherstellen und künftig automatisch sichern
+initAutosave();
 
 /*
 // Matrix mit 4 Zeilen und 2 Spalten  nicht löschen

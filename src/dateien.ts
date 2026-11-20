@@ -20,6 +20,59 @@ function input(id: string): HTMLInputElement {
     return byId<HTMLInputElement>(id);
 }
 
+/** Aktuelle Eingabe (Punkte und Schnittgrößen) als JSON-Text. */
+export function eingabeAlsJSON(): string {
+    const rows = polyTable().tBodies[0].rows;
+
+    const y = new Float64Array(rows.length);
+    const z = new Float64Array(rows.length);
+    for (let i = 0; i < rows.length; i++) {
+        y[i] = Number(rows[i].cells[1].innerText);
+        z[i] = Number(rows[i].cells[2].innerText);
+    }
+
+    return JSON.stringify({
+        npkte: input('input_pkte').value,
+        N: input('N_kraft').value.replace(/,/g, '.'),
+        My: input('My').value.replace(/,/g, '.'),
+        Mz: input('Mz').value.replace(/,/g, '.'),
+        Y: y,
+        Z: z,
+    });
+}
+
+/**
+ * Eingabe aus JSON-Text in Tabelle und Eingabefelder übernehmen.
+ * @return false, wenn der Text keine gültigen Querschnittsdaten enthält (es wird dann nichts geändert)
+ */
+export function eingabeEinlesen(json: string): boolean {
+    let jobj: PolyData;
+    try {
+        jobj = JSON.parse(json);
+    } catch {
+        return false;
+    }
+    const npkte = Number(jobj?.npkte);
+    if (!Number.isInteger(npkte) || npkte < 3 || typeof jobj.Y !== 'object' || typeof jobj.Z !== 'object') {
+        return false;
+    }
+
+    input('input_pkte').value = String(npkte);
+    input('N_kraft').value = jobj.N ?? '';
+    input('My').value = jobj.My ?? '';
+    input('Mz').value = jobj.Mz ?? '';
+
+    resize_polyTabelle();
+
+    const rows = polyTable().tBodies[0].rows;
+    for (let i = 0; i < rows.length; i++) {
+        rows[i].cells[1].innerText = String(jobj.Y[i] ?? '');
+        rows[i].cells[2].innerText = String(jobj.Z[i] ?? '');
+        rows[i].cells[3].innerText = '';
+    }
+    return true;
+}
+
 function handleFileSelect_read(): void {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
@@ -29,25 +82,8 @@ function handleFileSelect_read(): void {
 
         const reader = new FileReader();
         reader.onload = () => {
-            let jobj: PolyData;
-            try {
-                jobj = JSON.parse(String(reader.result));
-            } catch {
+            if (!eingabeEinlesen(String(reader.result))) {
                 alert('Die Datei enthält keine gültigen Querschnittsdaten.');
-                return;
-            }
-
-            input('input_pkte').value = String(jobj.npkte);
-            input('N_kraft').value = jobj.N;
-            input('My').value = jobj.My;
-            input('Mz').value = jobj.Mz;
-
-            resize_polyTabelle();
-
-            const rows = polyTable().tBodies[0].rows;
-            for (let i = 0; i < rows.length; i++) {
-                rows[i].cells[1].innerText = String(jobj.Y[i] ?? '');
-                rows[i].cells[2].innerText = String(jobj.Z[i] ?? '');
             }
         };
         reader.readAsText(file);
@@ -68,25 +104,7 @@ function download(blob: Blob, filename: string): void {
 }
 
 async function handleFileSelect_save(): Promise<void> {
-    const npkte = input('input_pkte').value;
-    const rows = polyTable().tBodies[0].rows;
-
-    const y = new Float64Array(rows.length);
-    const z = new Float64Array(rows.length);
-    for (let i = 0; i < rows.length; i++) {
-        y[i] = Number(rows[i].cells[1].innerText);
-        z[i] = Number(rows[i].cells[2].innerText);
-    }
-
-    const polyData = {
-        npkte,
-        N: input('N_kraft').value.replace(/,/g, '.'),
-        My: input('My').value.replace(/,/g, '.'),
-        Mz: input('Mz').value.replace(/,/g, '.'),
-        Y: y,
-        Z: z,
-    };
-    const blob = new Blob([JSON.stringify(polyData)], {type: 'text/plain'});
+    const blob = new Blob([eingabeAlsJSON()], {type: 'text/plain'});
 
     if (app.hasFSAccess && window.showSaveFilePicker) {
         try {
