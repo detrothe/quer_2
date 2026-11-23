@@ -7,7 +7,15 @@ import {spaltenbreiten_lesen, spaltenbreiten_setzen} from './components/dr-tabel
  * Dateiformat (JSON). Y und Z werden wie bisher als Objekt {"0": .., "1": ..} gespeichert
  * (früher ein serialisiertes Float64Array). Beim Einlesen werden Objekt und Array akzeptiert.
  */
+/**
+ * Version des Dateiformats (Projektdatei und automatische Sicherung). Bei jeder Änderung am Format hochzählen.
+ * 1 (Dateien ohne Angabe): ältere Dateien
+ * 2: mit spaltenbreiten (gezogene Spaltenbreiten der Tabelle)
+ */
+const DATEIVERSION = 2;
+
 interface PolyData {
+    version?: number;
     npkte: string | number;
     N: string;
     My: string;
@@ -33,6 +41,7 @@ export function eingabeAlsJSON(): string {
     const alsObjekt = (werte: string[]) => Object.fromEntries(werte.map((w, i) => [i, alsZahl(w)]));
 
     return JSON.stringify({
+        version: DATEIVERSION,
         npkte: String(y.length),
         N: input('N_kraft').value.replace(/,/g, '.'),
         My: input('My').value.replace(/,/g, '.'),
