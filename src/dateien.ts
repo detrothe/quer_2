@@ -1,6 +1,7 @@
 import {app, byId} from './state';
 import {leseRohwerte, setzePunkte, MIN_PUNKTE} from './punkte';
 import {alertdialog, confirmdialog} from './components/confirm_dialog';
+import {spaltenbreiten_lesen, spaltenbreiten_setzen} from './components/dr-tabelle';
 
 /**
  * Dateiformat (JSON). Y und Z werden wie bisher als Objekt {"0": .., "1": ..} gespeichert
@@ -13,6 +14,7 @@ interface PolyData {
     Mz: string;
     Y: Record<number, number | string | null>;
     Z: Record<number, number | string | null>;
+    spaltenbreiten?: Record<string, (number | null)[]>;   // vom Benutzer gezogene Spaltenbreiten (rem)
 }
 
 function input(id: string): HTMLInputElement {
@@ -37,6 +39,7 @@ export function eingabeAlsJSON(): string {
         Mz: input('Mz').value.replace(/,/g, '.'),
         Y: alsObjekt(y),
         Z: alsObjekt(z),
+        spaltenbreiten: spaltenbreiten_lesen(document),
     });
 }
 
@@ -63,6 +66,7 @@ export function eingabeEinlesen(json: string): boolean {
     const y = Array.from({length: npkte}, (_, i) => jobj.Y[i] ?? '');
     const z = Array.from({length: npkte}, (_, i) => jobj.Z[i] ?? '');
     setzePunkte(y, z);
+    spaltenbreiten_setzen(document, jobj.spaltenbreiten);
     return true;
 }
 

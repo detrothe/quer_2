@@ -7,6 +7,7 @@ import {app, byId, Detect} from './state';
 import {setzeAnzahl, setzePunkte, leereTabelle, zaehlerGeaendert, tabelleZeilenGeaendert, ZAEHLER_ID, TABELLE_ID, START_Y, START_Z} from './punkte';
 import {rechnen, zeichne2D} from './rechnen';
 import {initDateien, verwerfenBestaetigt, setzeDateiname, gespeichertenStandInitialisieren} from './dateien';
+import {spaltenbreiten_setzen} from './components/dr-tabelle';
 import {initAutosave} from './autosave';
 import {starteVersionspruefung} from './sw_update';
 import {initEinstellungen} from './einstellungen';
@@ -41,6 +42,7 @@ async function neueEingabe(): Promise<void> {
     for (const id of ['N_kraft', 'My', 'Mz']) byId<HTMLInputElement>(id).value = '';
     setzeAnzahl(4);
     leereTabelle();
+    spaltenbreiten_setzen(document, undefined);
     setzeDateiname('');
 }
 
